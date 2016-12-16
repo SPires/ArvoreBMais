@@ -44,6 +44,21 @@ TABM *Libera(TABM *a){
   }
 }
 
+TABM *Busca(TABM* x, int ch){
+  TABM *resp = NULL;
+  if(!x) return resp;
+  if(x->folha){ //chegou na folha e agora vai verificar todas até encontrar a chave
+      if(x->chave == ch)return x;
+      while(x->prox){
+        x = x->prox;
+        if(x->chave == ch) return x;
+  
+  //como fazer pra descer até as folhas?
+  int i = 0;
+  while(i < x->nchaves && ch > x->chave[i]) i++;
+  return Busca(x->filho[i], ch);
+}
+
 int main (int argc, char** argv) {
 
 }
