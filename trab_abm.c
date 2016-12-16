@@ -171,6 +171,8 @@ TABM* remover(TABM* arv, int ch, int t){
   return arv;
 }
     
+  
+  // obssssssss
  TABM *Insere(TAMB *T, int k, int t){
   if(Busca(T,k)) return T;
   if(!T){
