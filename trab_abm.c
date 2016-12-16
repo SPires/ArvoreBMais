@@ -29,7 +29,20 @@ TABM *Cria(int t){
   return novo;
 }
 
-
+TABM *Libera(TABM *a){
+  if(a){
+    if(!a->folha){
+      int i;
+      for(i = 0; i <= a->nchaves; i++) Libera(a->filho[i]);
+    }
+    free(a->chave);
+    free(a->filho);
+    free(a->info);
+    free(a->prox);
+    free(a);
+    return NULL;
+  }
+}
 
 int main (int argc, char** argv) {
 
