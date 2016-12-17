@@ -360,5 +360,13 @@ int gravarDados (TABM *a, char *saida){
 }
   
 int main (int argc, char** argv) {
-
+//códigos para chama de funções
+// 0 - sair
+// 1- carregar a base de dados.
+// 2- inserir um dado
+// 3- remover um dado
+// 4- otimizar a árvore
+// 5- alterar: 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
+// 6- mostrar árvore
+// 9- escrever árvore no arquivo.
 }
