@@ -242,6 +242,93 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   free(aux);
   return a;
 }
+
+TABM * alteraCR (TABM *a, int t, int mat, float novocr){
+  if (!a) return NULL;
+  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  aux = Busca(a,mat);
+  if (!aux) return NULL;
+  int i;
+  while (mat > aux->chave[i]) i++;
+  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  aluno = aux->info[i];
+  aluno->cr = novocr;
+  a = Insere(a,mat,t,aluno);
+  free(aluno);
+  free(aux);
+  return a;
+}
+
+TABM * alteraCH (TABM *a, int t, int mat, int novaCH){
+  if (!a) return NULL;
+  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  aux = Busca(a,mat);
+  if (!aux) return NULL;
+  int i;
+  while (mat > aux->chave[i]) i++;
+  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  aluno = aux->info[i];
+  aluno->ch_aprov = novaCH;
+  a = Insere(a,mat,t,aluno);
+  free(aluno);
+  free(aux);
+  return a;
+}
+
+TABM * alteraTranc (TABM *a, int t, int mat, int ntranc){
+  if (!a) return NULL;
+  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  aux = Busca(a,mat);
+  if (!aux) return NULL;
+  int i;
+  while (mat > aux->chave[i]) i++;
+  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  aluno = aux->info[i];
+  aluno->tranc = ntranc;
+  a = Insere(a,mat,t,aluno);
+  free(aluno);
+  free(aux);
+  return a;
+}
+
+TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
+  if (!a) return NULL;
+  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  aux = Busca(a,mat);
+  if (!aux) return NULL;
+  int i;
+  while (mat > aux->chave[i]) i++;
+  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  aluno = aux->info[i];
+  aluno->periodos = nperi;
+  a = Insere(a,mat,t,aluno);
+  free(aluno);
+  free(aux);
+  return a;
+}
+
+int gravarDados (TABM *a, char *saida){
+  int resp = 0;
+  if (!a) exit(1);
+  FILE *fp = fopen(saida,"wt+");
+  if (!fp) exit(1);
+  int i;
+  TREG *aux = (TREG *) malloc (sizeof(TREG*));
+  if (a->folha){
+    for (i=0;i<a->nchaves;i++){
+       aux = a->info[i];
+       fprintf(saida, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
+    }
+  }
+  aux = primeiraFolha(a);
+  while (aux) {
+    for (i=0;i<a->nchaves;i++){
+       aux = a->info[i];
+       fprintf(saida, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
+    }
+    aux = a->prox;
+  }
+}
   
 
 
