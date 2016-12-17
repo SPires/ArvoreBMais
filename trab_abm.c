@@ -228,7 +228,19 @@ TABM* remover(TABM* arv, int ch, int t){
   
   } 
     
-   
+TABM * alteraCR (TABM *a, int t, int mat, float novocr){
+  if (!a) return NULL;
+  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  aux = Busca(a,mat);
+  if (!aux) return NULL;
+  int i;
+  while (mat > aux->chave[i]) i++;
+  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  aluno = aux->info[i];
+  aluno->cr = novocr;
+  a = Insere(a,t,mat,aluno);
+}
+  
 
 
 
