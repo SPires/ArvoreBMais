@@ -174,12 +174,13 @@ TABM* remover(TABM* arv, int ch, int t){
     
   
   // obssssssss
- TABM *Insere(TAMB *T, int k, int t){
+ TABM *Insere(TAMB *T, int k, int t, reg *info){
   if(Busca(T,k)) return T;
   if(!T){
     T=Cria(t);
     T->chave[0] = k;
     T->nchaves=1;
+    T->info = info;
     return T;
   }
   if(T->nchaves == (2*t)-1){
@@ -188,10 +189,10 @@ TABM* remover(TABM* arv, int ch, int t){
     S->folha = 0;
     S->filho[0] = T;
     S = Divisao(S,1,T,t);
-    S = Insere_Nao_Completo(S,k,t);
+    S = Insere_Nao_Completo(S,k,t,info);
     return S;
   }
-  T = Insere_Nao_Completo(T,k,t);
+  T = Insere_Nao_Completo(T,k,t,info);
   return T;
 }   
   
