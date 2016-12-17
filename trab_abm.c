@@ -1,4 +1,3 @@
-//diretivas de compilação
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -220,13 +219,13 @@ TABM* remover(TABM* arv, int ch, int t){
       //      
     }  
   }
-    
-  //função auxiliar que vai retornar todas as folhas, uma a uma
-  //essa função é útil para as funções removeFormandos e removePeloTempoDeCurso, 
-  //pois vamos ter que passar por todas as folhas para fazer essas verificações 
-  TABM* varreFolhas (TABM*T){
   
-  } 
+ 
+TABM* primeiraFolha (TABM* t){
+  if (!t) return NULL;
+  if (t->folha) return t;
+  return primeiraFolha(t->filho[0]);
+} 
     
 TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   if (!a) return NULL;
@@ -238,7 +237,10 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   TREG *aluno = (TREG *) malloc (sizeof(TREG*));
   aluno = aux->info[i];
   aluno->cr = novocr;
-  a = Insere(a,t,mat,aluno);
+  a = Insere(a,mat,t,aluno);
+  free(aluno);
+  free(aux);
+  return a;
 }
   
 
