@@ -199,29 +199,73 @@ TABM* remover(TABM* arv, int ch, int t){
   
   
   //função que vai chamar as outras funções que vão executar algum tipo atualização na árvore
-  void otimizaArvore(TABM *T){
-    if(T){
-      removeFormandos(T); 
-      removePeloTempoDeCurso(T);
-    }
+  TABM * otimizaArvore(TABM *a, int t){
+    if(!a) return NULL;
+    a = removeFormandos(a,t); 
+    a = removePeloTempoDeCurso(a,t);
+    return t;
+   }
     
   //remove todos os registros com: - CHCS = TNC e CHCS < 50% de CHT
   //                               - CHCS = NTOTPER e CHCS < CHT  
-  void removeFormandos(TABM * T){
-    if(T){
-      //
-    }  
+  TABM * removeFormandos(TABM * a, int t){
+    if(!a) return NULL;
+    TABM * aux = (TABM *) malloc (sizeof(TABM*));
+    if (!a->folha) a = primeiraFolha(a);
+    TREG * dado = (TREG *) malloc (sizeof(TREG));
+    int i;
+    while (a){
+        for (i=0;i<t->nchaves;i++){
+            dado = a->info[i];
+            if (dado->cur == 1 && dado->ch_aprov == 2955) remover(a,dado->mat,t);
+            if (dado->cur == 2 && dado->ch_aprov == 3524) remover(a,dado->mat,t);
+            if (dado->cur == 3 && dado->ch_aprov == 3200) remover(a,dado->mat,t);
+        }
+        a = a->prox;
+    }
+    free(dado);
+    free(aux);
+    return a;
   }  
     
   //remove todos os registros com NPU NTOTPER 
-  void removePeloTempoDeCurso(TABM * T){
-    if(T){
-      //      
-    }  
+  TABM * removePeloTempoDeCurso(TABM * a, int t){
+    if(!a) return NULL;
+    TABM * aux = (TABM *) malloc (sizeof(TABM*));
+    if (!a->folha) a = primeiraFolha(a);
+    TREG * dado = (TREG *) malloc (sizeof(TREG));
+    int i;
+    while (a){
+        for (i=0;i<t->nchaves;i++){
+            dado = a->info[i];
+            if (dado->cur == 1){
+              if (dado->periodos == 16 && dados->ch_aprov !=2955)
+                 remover(a,dado->mat,t);
+              if (dado->periodos == 8 && dados->ch_aprov < 1477)
+                 remover(a,dado->mat,t);
+            }
+            if (dado->cur == 2){
+              if (dado->periodos == 12 && dados->ch_aprov !=3524)
+                 remover(a,dado->mat,t);
+              if (dado->periodos == 8 && dados->ch_aprov < 1762)
+                 remover(a,dado->mat,t);
+            }
+            if (dado->cur == 3){
+              if (dado->periodos == 12 && dados->ch_aprov !=3200)
+                 remover(a,dado->mat,t);
+              if (dado->periodos == 8 && dados->ch_aprov < 1600)
+                 remover(a,dado->mat,t);
+            }
+        }
+        a = a->prox;
+    }
+    free(dado);
+    free(aux);
+    return a;
   }
   
  
-TABM* primeiraFolha (TABM* t){
+TABM * primeiraFolha (TABM* t){
   if (!t) return NULL;
   if (t->folha) return t;
   return primeiraFolha(t->filho[0]);
@@ -243,23 +287,7 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   return a;
 }
 
-TABM * alteraCR (TABM *a, int t, int mat, float novocr){
-  if (!a) return NULL;
-  TABM *aux = (TABM*) malloc (sizeof(TABM*));
-  aux = Busca(a,mat);
-  if (!aux) return NULL;
-  int i;
-  while (mat > aux->chave[i]) i++;
-  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
-  aluno = aux->info[i];
-  aluno->cr = novocr;
-  a = Insere(a,mat,t,aluno);
-  free(aluno);
-  free(aux);
-  return a;
-}
-
-TABM * alteraCH (TABM *a, int t, int mat, int novaCH){
+TABM *alteraCH (TABM *a, int t, int mat, int novaCH){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM*));
   aux = Busca(a,mat);
@@ -308,8 +336,7 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
 }
 
 int gravarDados (TABM *a, char *saida){
-  int resp = 0;
-  if (!a) exit(1);
+  if (!a) return 0;
   FILE *fp = fopen(saida,"wt+");
   if (!fp) exit(1);
   int i;
@@ -328,11 +355,10 @@ int gravarDados (TABM *a, char *saida){
     }
     aux = a->prox;
   }
+  free(aux);
+  return 1;
 }
   
-
-
-
 int main (int argc, char** argv) {
 
 }
