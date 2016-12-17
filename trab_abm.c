@@ -74,25 +74,28 @@ TABM* remover(TABM* arv, int ch, int t){
     if(arv->folha){ 
       printf("\nCASO 1\n");
       int j;
-      for(j=i; j<arv->nchaves-1;j++) arv->chave[j] = arv->chave[j+1];
+      for(j=i; j<arv->nchaves-1;j++) {
+        arv->chave[j] = arv->chave[j+1];
+        arv->info[j] = arv->info[j+1];
+      }
       arv->nchaves--;
       return arv;      
     }     
   }
-  //ok até aqui !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-  //falta ver a partir daqui
   TABM *y = arv->filho[i], *z = NULL;
   if (y->nchaves == t-1){ //CASOS 3A e 3B
     if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){ //CASO 3A
       printf("\nCASO 3A: i menor que nchaves\n");
       z = arv->filho[i+1];
       y->chave[t-1] = z->chave[0];   //dar a y a chave i da arv
+      y->info[t-1] = z->info[0];
       y->nchaves++;
-      arv->chave[i] = z->chave[0];     //O VALOR DO PAI FICA O MESMO, OU PASSA A SER IGUAL AO QUE FOI EMPRESTADO?
+      arv->chave[i] = z->chave[1];
       int j;
-      for(j=0; j < z->nchaves-1; j++)  //ajustar chaves de z
+      for(j=0; j < z->nchaves-1; j++){
         z->chave[j] = z->chave[j+1];
-      //z->chave[j] = 0; Rosseti
+        z->info[j] = z->info[j+1];
+      }
       y->filho[y->nchaves] = z->filho[0]; //enviar ponteiro menor de z para o novo elemento em y
       for(j=0; j < z->nchaves; j++)       //ajustar filhos de z
         z->filho[j] = z->filho[j+1];
@@ -104,14 +107,17 @@ TABM* remover(TABM* arv, int ch, int t){
       printf("\nCASO 3A: i igual a nchaves\n");
       z = arv->filho[i-1];
       int j;
-      for(j = y->nchaves; j>0; j--)               //encaixar lugar da nova chave
+      for(j = y->nchaves; j>0; j--) {              //encaixar lugar da nova chave
         y->chave[j] = y->chave[j-1];
+        y->info[j] = y->info[j-1];
+      }
       for(j = y->nchaves+1; j>0; j--)             //encaixar lugar dos filhos da nova chave
         y->filho[j] = y->filho[j-1];
       //PAREI AQUI
-      y->chave[0] = arv->chave[i-1];              //dar a y a chave i da arv
+      y->chave[0] = z->chave[z->nchaves-1];
+      y->info[0] = z->chave[z->nchaves-1];
       y->nchaves++;
-      arv->chave[i-1] = z->chave[z->nchaves-1];   //dar a arv uma chave de z
+      arv->chave[i-1] = y->chave[0];
       y->filho[0] = z->filho[z->nchaves];         //enviar ponteiro de z para o novo elemento em y
       z->nchaves--;
       arv->filho[i] = remover(y, ch, t);
@@ -173,30 +179,33 @@ TABM* remover(TABM* arv, int ch, int t){
     
   
   // obssssssss
- TABM *Insere(TAMB *T, int k, int t, reg *info){
-  if(Busca(T,k)) return T;
-  if(!T){
-    T=Cria(t);
-    T->chave[0] = k;
-    T->nchaves=1;
-    T->info = info;
-    return T;
+ TABM *Insere(TABM *a, int k, int t, TREG *dado){
+  if(Busca(a,k)){
+    int i;
+    while (k > a->chave[i]) i++;
+    a->info[i] = dado;
+    return a;
   }
-  if(T->nchaves == (2*t)-1){
+  if(!a){
+    a = Cria(t);
+    a->chave[0] = k;
+    a->folha = 1;
+    a->nchaves = 1;
+    a->info[0] = dado;
+    return a;
+  }
+  if(a->nchaves == (2*t)-1){
     TABM *S = Cria(t);
     S->nchaves=0;
     S->folha = 0;
-    S->filho[0] = T;
-    S = Divisao(S,1,T,t);
+    S->filho[0] = a;
+    S = Divisao(S,1,a,t);
     S = Insere_Nao_Completo(S,k,t,info);
     return S;
   }
-  T = Insere_Nao_Completo(T,k,t,info);
-  return T;
-}   
-  
-  
-  
+  a = Insere_Nao_Completo(a,k,t,info);
+  return a;
+}
   
   //função que vai chamar as outras funções que vão executar algum tipo atualização na árvore
   TABM * otimizaArvore(TABM *a, int t){
@@ -335,6 +344,21 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
   return a;
 }
 
+TABM * novaArv (char *nome, int t){
+   FILE *fp = fopen(nome,"rt");
+   if (!fp) exit(1);
+   TABM *a = Cria(t);
+   TREG *aux = (TREG *) malloc (sizeof(TREG*));
+   int r = fscanf(fp,"%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
+   while (r != -1){
+      a = Insere(a,aux->mat,t,aux);
+      r = fscanf(fp,"%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
+   }
+   free(aux);
+   fclose(fp);
+   return a;
+}
+
 int gravarDados (TABM *a, char *saida){
   if (!a) return 0;
   FILE *fp = fopen(saida,"wt+");
@@ -344,18 +368,21 @@ int gravarDados (TABM *a, char *saida){
   if (a->folha){
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
-       fprintf(saida, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
+       fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
     }
   }
   aux = primeiraFolha(a);
   while (aux) {
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
-       fprintf(saida, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
+       fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
     }
     aux = a->prox;
   }
+  fclose(fp);
   free(aux);
+  a = Libera(a);
+  free(a);
   return 1;
 }
   
