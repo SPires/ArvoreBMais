@@ -80,7 +80,8 @@ TABM* remover(TABM* arv, int ch, int t){
       return arv;      
     }     
   }
-  //ok até aqui
+  //ok até aqui !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+  //falta ver a partir daqui
   TABM *y = arv->filho[i], *z = NULL;
   if (y->nchaves == t-1){ //CASOS 3A e 3B
     if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){ //CASO 3A
@@ -193,9 +194,41 @@ TABM* remover(TABM* arv, int ch, int t){
   T = Insere_Nao_Completo(T,k,t);
   return T;
 }   
-
-              
   
+  
+  
+  
+  //função que vai chamar as outras funções que vão executar algum tipo atualização na árvore
+  void otimizaArvore(TABM *T){
+    if(T){
+      removeFormandos(T); 
+      removePeloTempoDeCurso(T);
+    }
+  }
+  
+  //remove todos os registros com: - CHCS = TNC e CHCS < 50% de CHT
+  //                               - CHCS = NTOTPER e CHCS < CHT  
+  void removeFormandos(TABM * T){
+    if(T){
+      //
+    }  
+  }  
+  //remove todos os registros com NPU NTOTPER 
+  void removePeloTempoDeCurso(TABM * T){
+    if(T){
+      //      
+    }  
+  }
+  
+  //função auxiliar que vai retornar todas as folhas, uma a uma
+  //essa função é útil para as funções removeFormandos e removePeloTempoDeCurso, 
+  //pois vamos ter que passar por todas as folhas para fazer essas verificações 
+  TABM* varreFolhas (TABM*T){
+  
+  } 
+    
+   
+
 
 
 int main (int argc, char** argv) {
