@@ -21,7 +21,7 @@ TABM *Cria(int t){
   novo->nchaves = 0;
   novo->chave = (int *) malloc (sizeof(int*)*((t*2)-1));
   novo->folha = 1;
-  novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1));
+  novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1)); //hmmmmm
   novo->filho = (TAB **) malloc (sizeof(TAB*)*t*2);
   novo->prox = (TABM *) malloc (sizeof(TABM*));
   int i;
@@ -205,8 +205,7 @@ TABM* remover(TABM* arv, int ch, int t){
       removeFormandos(T); 
       removePeloTempoDeCurso(T);
     }
-  }
-  
+    
   //remove todos os registros com: - CHCS = TNC e CHCS < 50% de CHT
   //                               - CHCS = NTOTPER e CHCS < CHT  
   void removeFormandos(TABM * T){
@@ -214,13 +213,14 @@ TABM* remover(TABM* arv, int ch, int t){
       //
     }  
   }  
+    
   //remove todos os registros com NPU NTOTPER 
   void removePeloTempoDeCurso(TABM * T){
     if(T){
       //      
     }  
   }
-  
+    
   //função auxiliar que vai retornar todas as folhas, uma a uma
   //essa função é útil para as funções removeFormandos e removePeloTempoDeCurso, 
   //pois vamos ter que passar por todas as folhas para fazer essas verificações 
