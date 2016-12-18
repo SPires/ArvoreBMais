@@ -181,8 +181,8 @@ TABM* remover(TABM* arv, int ch, int t){
   return arv;
 }
 
-TAB *Divisao(TAB *x, int i, TAB* y, int t){
-  TAB *z=Cria(t);
+TABM *Divisao(TABM *x, int i, TABM* y, int t){
+  TABM *z=Cria(t);
   z->nchaves= t - 1;
   z->folha = y->folha;
   int j;
@@ -208,12 +208,12 @@ TAB *Divisao(TAB *x, int i, TAB* y, int t){
   return x;
 }
 
-TAB *Insere_Nao_Completo(TAB *x, int k, int t, TREG *dado){
+TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   int i = x->nchaves-1;
   if(x->folha){
     while((i>=0) && (k<x->chave[i])){
       x->chave[i+1] = x->chave[i];
-	  x->chave[i+1] = x->info[i];
+	  x->info[i+1] = x->info[i];
       i--;
     }
     x->chave[i+1] = k;
@@ -252,10 +252,10 @@ TABM *Insere(TABM *a, int k, int t, TREG *dado){
     S->folha = 0;
     S->filho[0] = a;
     S = Divisao(S,1,a,t);
-    S = Insere_Nao_Completo(S,k,t,info);
+    S = Insere_Nao_Completo(S,k,t,dado);
     return S;
   }
-  a = Insere_Nao_Completo(a,k,t,info);
+  a = Insere_Nao_Completo(a,k,t,dado);
   return a;
 }
 
@@ -264,11 +264,9 @@ TABM * removePeloTempoDeCurso (TABM *a, int t);
 
 TABM * otimizaArvore(TABM *a, int t){
     if(!a) return NULL;
-	TABM *nova = (TABM*) malloc (sizeof(TABM*));
-	nova = a;
-    nova = removeFormandos(nova,t); 
-    nova = removePeloTempoDeCurso(nova,t);
-    return nova;
+    a = removeFormandos(a,t); 
+    a = removePeloTempoDeCurso(a,t);
+    return a;
    }
 
 TABM* primeiraFolha(TABM* a);
@@ -280,7 +278,7 @@ TABM * removeFormandos(TABM * a, int t){
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
     while (a){
-        for (i=0;i<t->nchaves;i++){
+        for (i=0;i<a->nchaves;i++){
             dado = a->info[i];
             if (dado->cur == 1 && dado->ch_aprov == 2955) remover(a,dado->mat,t);
             if (dado->cur == 2 && dado->ch_aprov == 3524) remover(a,dado->mat,t);
@@ -300,24 +298,24 @@ TABM * removePeloTempoDeCurso(TABM * a, int t){
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
     while (aux){
-        for (i=0;i<t->nchaves;i++){
+        for (i=0;i<a->nchaves;i++){
             dado = aux->info[i];
             if (dado->cur == 1){
-              if (dado->periodos == 16 && dados->ch_aprov !=2955)
+              if (dado->periodos == 16 && dado->ch_aprov !=2955)
                  remover(aux,dado->mat,t);
-              if (dado->periodos == 8 && dados->ch_aprov < 1477)
+              if (dado->periodos == 8 && dado->ch_aprov < 1477)
                  remover(aux,dado->mat,t);
             }
             if (dado->cur == 2){
-              if (dado->periodos == 12 && dados->ch_aprov !=3524)
+              if (dado->periodos == 12 && dado->ch_aprov !=3524)
                  remover(aux,dado->mat,t);
-              if (dado->periodos == 8 && dados->ch_aprov < 1762)
+              if (dado->periodos == 8 && dado->ch_aprov < 1762)
                  remover(aux,dado->mat,t);
             }
             if (dado->cur == 3){
-              if (dado->periodos == 12 && dados->ch_aprov !=3200)
+              if (dado->periodos == 12 && dado->ch_aprov !=3200)
                  remover(aux,dado->mat,t);
-              if (dado->periodos == 8 && dados->ch_aprov < 1600)
+              if (dado->periodos == 8 && dado->ch_aprov < 1600)
                  remover(aux,dado->mat,t);
             }
         }
@@ -425,13 +423,13 @@ int gravarDados (TABM *a, char *saida){
        fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
     }
   }
-  aux = primeiraFolha(a);
+  a = primeiraFolha(a);
   while (aux) {
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
        fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
     }
-    aux = a->prox;
+    a = a->prox;
   }
   fclose(fp);
   free(aux);
