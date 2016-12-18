@@ -385,8 +385,144 @@ int gravarDados (TABM *a, char *saida){
   free(a);
   return 1;
 }
+
+void imprimeinfo(TREG* r)
+{
+    printf("%d ",t->mat);
+    printf("%f ",t->cr);
+    printf("%d ",t->tranc);
+    printf("%d %d %d ", t->ch_aprov,t->periodos,t->cur);
+    printf("%s ",t->nome);
+}
+  
+  
+void imprime(TABM* t)
+{
+  if(t)
+  {
+    printf("(");
+    if(t->folha)
+    {
+      int i;
+      for(i=0; i<t->nchaves; i++)
+      {
+        imprimeinfo(t->info[i]);
+        printf(" ");
+      }
+    }
+    else
+    {
+      int i;
+      for(i=0; i<t->nchaves; i++)
+      {
+        imprime(t->filho[i]);
+        printf(":");
+        printf("%d:",t->chaves[i]);
+        printf(":");
+      
+      }
+      imprime(t->filho[i]);
+    }
+    printf(")");
+  }
+}
+  
   
 int main (int argc, char** argv) {
+  int op=-1;
+  int t=-1;
+  TABM* arvore=NULL;
+  
+  while(1)
+  {
+    do
+    {
+      printf("0 - sair\n");
+      printf("1 - carregar a base de dados\n");
+      printf("2 - inserir um dado\n");
+      printf("3 - remover um dado\n");
+      printf("4 - otimizar a árvore\n");
+      printf("5 - alterar\n");
+      printf("6 - mostrar arvore\n");
+      printf("9 - escrever arvore no arquivo\n");
+    }while(op<0||(op!=9&&op>6))
+    switch(op)
+    {
+      case 0:
+        return 0;
+        break;
+      case 1:
+        char nome[501];
+        printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+        scanf("%500[^\n]",nome);
+        fflush(stdin);
+        printf("Digite o t : ");
+        scanf("%d",&t);
+        if(arvore)
+           Libera(arvore);
+        arvore=novaArv(nome,t);
+        imprime(arvore);
+        break;
+      case 2:
+        TREG* novo=(TREG*)calloc(sizeof(TREG),1);
+        int mat=-1;
+        float cr=-1;
+        int tranc=0;
+        int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
+        char *nome=(char*)calloc(sizeof(char),101);
+        if(!novo || !nome)
+        {
+          fprintf(stderr,"%s:%d alocacao de memoria falhou, libere memoria \n", __FILE__, __LINE__);
+          break;
+        }
+        printf("Digite a matricula : ");
+        scanf("%d",&mat);
+        printf("Digite o cr : ");
+        scanf("%f", &cr);
+        printf("Digite o numero de trancamentos : ");
+        scanf("%d", &tranc);
+        printf("Digite a carga horaria aprovada : ");
+        scanf("%d", &ch_aprov);
+        printf("Digite o numero de periodos : ");
+        scanf("%d", &periodos);
+        printf("Digite o numero do curriculo : ");
+        scanf("%d", &cur);
+        printf("Digite o nome do candidato (tamanho maximo de 100 caracteres, os excedentes serao ignorados : ");
+        scanf("%100[^\n]", nome);
+        novo->mat=mat;
+        novo->cr=cr;
+        novo->tranc=tranc;
+        novo->ch_aprov=ch_aprov;
+        novo->periodos=periodos;
+        novo->cur=cur;
+        novo->nome=nome;
+        arvore=insere(arvore,mat,t,novo);
+        imprime(arvore);
+        break;
+      case 3:
+        int mat;
+        printf("Digite a matricula a remover : ");
+        scanf("%d", &mat);
+        arvore=retira(arvore,mat,t);
+        imprime(arvore);
+        break;
+      case 4:
+        arvore=otimiza(arvore);
+        imprime(arvore);
+        break;
+      case 5:
+        // 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
+      case 6:
+        imprime(arvore);
+        break;
+      case 9:
+        char nome[501];
+        printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+        scanf("%500[^\n]",nome);
+        fflush(stdin);
+        gravar(arvore,nome);
+    }
+  }
 //códigos para chama de funções
 // 0 - sair
 // 1- carregar a base de dados.
@@ -396,4 +532,5 @@ int main (int argc, char** argv) {
 // 5- alterar: 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
 // 6- mostrar árvore
 // 9- escrever árvore no arquivo.
+return 0;
 }
