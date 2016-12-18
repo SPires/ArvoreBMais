@@ -18,11 +18,11 @@ typedef struct reg {
 TABM *Cria(int t){
   TABM* novo = (TABM *) malloc (sizeof(TABM));
   novo->nchaves = 0;
-  novo->chave = (int *) malloc (sizeof(int*)*((t*2)-1));
+  novo->chave = (int *) malloc (sizeof(int)*((t*2)-1));
   novo->folha = 1;
   novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1)); //hmmmmm
   novo->filho = (TABM **) malloc (sizeof(TABM*)*t*2);
-  novo->prox = (TABM *) malloc (sizeof(TABM*));
+  novo->prox = (TABM *) malloc (sizeof(TABM));
   int i;
   for(i=0; i<(t*2); i++) novo->filho[i] = NULL;
   return novo;
@@ -273,7 +273,7 @@ TABM* primeiraFolha(TABM* a);
 
 TABM * removeFormandos(TABM * a, int t){
     if(!a) return NULL;
-    TABM * aux = (TABM *) malloc (sizeof(TABM*));
+    TABM * aux = (TABM *) malloc (sizeof(TABM));
     if (!a->folha) a = primeiraFolha(a);
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
@@ -293,7 +293,7 @@ TABM * removeFormandos(TABM * a, int t){
 
 TABM * removePeloTempoDeCurso(TABM * a, int t){
     if(!a) return NULL;
-    TABM * aux = (TABM *) malloc (sizeof(TABM*));
+    TABM * aux = (TABM *) malloc (sizeof(TABM));
     if (!a->folha) aux = primeiraFolha(a);
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
@@ -334,12 +334,12 @@ TABM * primeiraFolha (TABM* t){
     
 TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   if (!a) return NULL;
-  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  TABM *aux = (TABM*) malloc (sizeof(TABM));
   aux = Busca(a,mat);
   if (!aux) return NULL;
   int i;
   while (mat > aux->chave[i]) i++;
-  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  TREG *aluno = (TREG *) malloc (sizeof(TREG));
   aluno = aux->info[i];
   aluno->cr = novocr;
   a = Insere(a,mat,t,aluno);
@@ -350,12 +350,12 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
 
 TABM *alteraCH (TABM *a, int t, int mat, int novaCH){
   if (!a) return NULL;
-  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  TABM *aux = (TABM*) malloc (sizeof(TABM));
   aux = Busca(a,mat);
   if (!aux) return NULL;
   int i;
   while (mat > aux->chave[i]) i++;
-  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  TREG *aluno = (TREG *) malloc (sizeof(TREG));
   aluno = aux->info[i];
   aluno->ch_aprov = novaCH;
   a = Insere(a,mat,t,aluno);
@@ -366,12 +366,12 @@ TABM *alteraCH (TABM *a, int t, int mat, int novaCH){
 
 TABM * alteraTranc (TABM *a, int t, int mat, int ntranc){
   if (!a) return NULL;
-  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  TABM *aux = (TABM*) malloc (sizeof(TABM));
   aux = Busca(a,mat);
   if (!aux) return NULL;
   int i;
   while (mat > aux->chave[i]) i++;
-  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  TREG *aluno = (TREG *) malloc (sizeof(TREG));
   aluno = aux->info[i];
   aluno->tranc = ntranc;
   a = Insere(a,mat,t,aluno);
@@ -382,12 +382,12 @@ TABM * alteraTranc (TABM *a, int t, int mat, int ntranc){
 
 TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
   if (!a) return NULL;
-  TABM *aux = (TABM*) malloc (sizeof(TABM*));
+  TABM *aux = (TABM*) malloc (sizeof(TABM));
   aux = Busca(a,mat);
   if (!aux) return NULL;
   int i;
   while (mat > aux->chave[i]) i++;
-  TREG *aluno = (TREG *) malloc (sizeof(TREG*));
+  TREG *aluno = (TREG *) malloc (sizeof(TREG));
   aluno = aux->info[i];
   aluno->periodos = nperi;
   a = Insere(a,mat,t,aluno);
@@ -400,7 +400,7 @@ TABM * novaArv (char *nome, int t){
    FILE *fp = fopen(nome,"rt");
    if (!fp) exit(1);
    TABM *a = Cria(t);
-   TREG *aux = (TREG *) malloc (sizeof(TREG*));
+   TREG *aux = (TREG *) malloc (sizeof(TREG));
 
    int r = fscanf(fp,"%d %f %d %d %d %d %[^\n]\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
    while (r == 7){
@@ -417,7 +417,7 @@ int gravarDados (TABM *a, char *saida){
   FILE *fp = fopen(saida,"wt+");
   if (!fp) exit(1);
   int i;
-  TREG *aux = (TREG *) malloc (sizeof(TREG*));
+  TREG *aux = (TREG *) malloc (sizeof(TREG));
   if (a->folha){
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
