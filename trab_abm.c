@@ -45,14 +45,15 @@ void Libera(TABM *a){
 TABM *Busca(TABM* x, int ch){
   TABM *resp = NULL;
   if(!x) return resp;
-  int i = 0;
-  for(i=0; i<nchaves; i++)
-  {
-		  if(x->chaves
+  int i;
+  if (x->folha==1){
+  	for(i=0;i<x->nchaves;i++)
+		if (x->chave[i]==ch)
+			resp = x;
+	return resp;
   }
-  if(x->folha){ //chegou na folha e agora vai verificar todas até encontrar a chave
-
-  }
+  while(ch > x->chave[i]) i++;
+  return Busca(x->filho[i],ch);
 }
     
     
