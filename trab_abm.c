@@ -78,7 +78,7 @@ TABM* remover(TABM* arv, int ch, int t){
         arv->chave[j] = arv->chave[j+1];
         arv->info[j] = arv->info[j+1];
       }
-      arv->prox[i-1] = arv-chave[i];    
+      arv->prox[i-1] = arv->chave[i];  //Prox[i-1] e  chave[i] sao de tipos diferentes, nao????
       arv->nchaves--;
       return arv;      
     }     
@@ -387,8 +387,8 @@ int gravarDados (TABM *a, char *saida){
   }
   fclose(fp);
   free(aux);
-  a = Libera(a);
-  free(a);
+  Libera(a);
+  a=NULL;
   return 1;
 }
 
@@ -423,7 +423,7 @@ void imprime(TABM* t)
       {
         imprime(t->filho[i]);
         printf(":");
-        printf("%d:",t->chaves[i]);
+        printf("%d:",t->chave[i]);
         printf(":");
       
       }
@@ -541,7 +541,7 @@ int main () {
 								float cr;
 								printf("Digite o cr : ");
 								scanf("%f", &cr);
-								arvore=alteraCR(arvore,t,k,cr);
+								arvore=alteraCR(arvore,t,mat,cr);
 								imprime(arvore);
 								break;
 							}
@@ -550,7 +550,7 @@ int main () {
 								int carOraria;
 								printf("Digite a Carga Horaria : ");
 								scanf("%d", &carOraria);
-								arvore=alteraCH(arvore,t,k,carOraria);
+								arvore=alteraCH(arvore,t,mat,carOraria);
 								imprime(arvore);
 								break;	
 							}
@@ -559,7 +559,7 @@ int main () {
 									int tranc;
 									printf("Digite o numero de trancamentos : ");
 									scanf("%d", &tranc);
-									arvore=alteraTranc(arvore,t,k,tranc);
+									arvore=alteraTranc(arvore,t,mat,tranc);
 									imprime(arvore);
 									break;
 							}
@@ -568,7 +568,7 @@ int main () {
 									int periodos;
 									printf("Digite o numero de periodos : ");
 									scanf("%d", &periodos);
-									arvore=alteraPeriodo(arvore,t,k,periodos);
+									arvore=alteraPeriodo(arvore,t,mat,periodos);
 									imprime(arvore);
 									break;
 							}
@@ -589,7 +589,7 @@ int main () {
 			break;
 		}
     }
-  }}
+  }
 //códigos para chama de funções
 // 0 - sair
 // 1- carregar a base de dados.
