@@ -399,7 +399,7 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
 TABM * novaArv (char *nome, int t){
    FILE *fp = fopen(nome,"rt");
    if (!fp) exit(1);
-   TABM *a = NULL;
+   TABM *a = Cria(t);
    TREG *aux = (TREG *) malloc (sizeof(TREG*));
 
    int r = fscanf(fp,"%d %f %d %d %d %d %[^\n]\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
