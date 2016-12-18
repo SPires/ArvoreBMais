@@ -112,7 +112,6 @@ TABM* remover(TABM* arv, int ch, int t){
       }
       for(j = y->nchaves+1; j>0; j--)             //encaixar lugar dos filhos da nova chave
         y->filho[j] = y->filho[j-1];
-      //PAREI AQUI
       y->chave[0] = z->chave[z->nchaves-1];
       y->info[0] = z->chave[z->nchaves-1];
       y->nchaves++;
@@ -127,16 +126,17 @@ TABM* remover(TABM* arv, int ch, int t){
       if(i < arv->nchaves && arv->filho[i+1]->nchaves == t-1){
         printf("\nCASO 3B: i menor que nchaves\n");
         z = arv->filho[i+1];
-        y->chave[t-1] = arv->chave[i];     //pegar chave [i] e coloca ao final de filho[i]
-        y->nchaves++;
+        //y->chave[t-1] = arv->chave[i];     //pegar chave [i] e coloca ao final de filho[i]
+        //y->nchaves++;
         int j;
         for(j=0; j < t-1; j++){
-          y->chave[t+j] = z->chave[j];     //passar filho[i+1] para filho[i]
-          y->nchaves++;
+          y->chave[t-1+j] = z->chave[j];     //passar filho[i+1] para filho[i]
+          y->info[t-1+j] = z->info[j];
+	  y->nchaves++;
         }
         if(!y->folha){
           for(j=0; j<t; j++){
-            y->filho[t+j] = z->filho[j];
+            y->filho[t-1+j] = z->filho[j];
           }
         }
         for(j=i; j < arv->nchaves-1; j++){ //limpar referÃªncias de i
@@ -150,19 +150,20 @@ TABM* remover(TABM* arv, int ch, int t){
       if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ 
         printf("\nCASO 3B: i igual a nchaves\n");
         z = arv->filho[i-1];
-        if(i == arv->nchaves)
-          z->chave[t-1] = arv->chave[i-1]; //pegar chave[i] e poe ao final de filho[i-1]
-        else
-          z->chave[t-1] = arv->chave[i];   //pegar chave [i] e poe ao final de filho[i-1]
-        z->nchaves++;
+        //if(i == arv->nchaves)
+        //  z->chave[t-1] = arv->chave[i-1]; //pegar chave[i] e poe ao final de filho[i-1]
+        //else
+        //  z->chave[t-1] = arv->chave[i];   //pegar chave [i] e poe ao final de filho[i-1]
+        //z->nchaves++;
         int j;
         for(j=0; j < t-1; j++){
-          z->chave[t+j] = y->chave[j];     //passar filho[i+1] para filho[i]
-          z->nchaves++;
+          z->chave[t-1+j] = y->chave[j];     //passar filho[i+1] para filho[i]
+          z->info[t-1+j] = y->info[j];
+	  z->nchaves++;
         }
         if(!z->folha){
           for(j=0; j<t; j++){
-            z->filho[t+j] = y->filho[j];
+            z->filho[t-1+j] = y->filho[j];
           }
         }
         arv->nchaves--;
