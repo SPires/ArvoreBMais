@@ -271,6 +271,8 @@ TABM * otimizaArvore(TABM *a, int t){
     return nova;
    }
 
+TABM* primeiraFolha(TABM* a);
+
 TABM * removeFormandos(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM*));
@@ -294,32 +296,32 @@ TABM * removeFormandos(TABM * a, int t){
 TABM * removePeloTempoDeCurso(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM*));
-    if (!a->folha) a = primeiraFolha(a);
+    if (!a->folha) aux = primeiraFolha(a);
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
-    while (a){
+    while (aux){
         for (i=0;i<t->nchaves;i++){
-            dado = a->info[i];
+            dado = aux->info[i];
             if (dado->cur == 1){
               if (dado->periodos == 16 && dados->ch_aprov !=2955)
-                 remover(a,dado->mat,t);
+                 remover(aux,dado->mat,t);
               if (dado->periodos == 8 && dados->ch_aprov < 1477)
-                 remover(a,dado->mat,t);
+                 remover(aux,dado->mat,t);
             }
             if (dado->cur == 2){
               if (dado->periodos == 12 && dados->ch_aprov !=3524)
-                 remover(a,dado->mat,t);
+                 remover(aux,dado->mat,t);
               if (dado->periodos == 8 && dados->ch_aprov < 1762)
-                 remover(a,dado->mat,t);
+                 remover(aux,dado->mat,t);
             }
             if (dado->cur == 3){
               if (dado->periodos == 12 && dados->ch_aprov !=3200)
-                 remover(a,dado->mat,t);
+                 remover(aux,dado->mat,t);
               if (dado->periodos == 8 && dados->ch_aprov < 1600)
-                 remover(a,dado->mat,t);
+                 remover(aux,dado->mat,t);
             }
         }
-        a = a->prox;
+        aux = aux->prox;
     }
     free(dado);
     free(aux);
