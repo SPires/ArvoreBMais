@@ -46,15 +46,13 @@ TABM *Busca(TABM* x, int ch){
   TABM *resp = NULL;
   if(!x) return resp;
   int i = 0;
+  for(i=0; i<nchaves; i++)
+  {
+		  if(x->chaves
+  }
   if(x->folha){ //chegou na folha e agora vai verificar todas até encontrar a chave
-    if(x->chave == ch)return x;
-    while(i < x->nchaves){
-      x = x->prox;
-      if(x->chave == ch) return x;
-  }    
-  i = 0;
-  while(i < x->nchaves && ch > x->chave[i]) i++;
-  return Busca(x->filho[i], ch);
+
+  }
 }
     
     
@@ -349,10 +347,10 @@ TABM * novaArv (char *nome, int t){
    if (!fp) exit(1);
    TABM *a = Cria(t);
    TREG *aux = (TREG *) malloc (sizeof(TREG*));
-   int r = fscanf(fp,"%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
+   int r = fscanf(fp,"%d %f %d %d %d %d %s\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
    while (r != -1){
       a = Insere(a,aux->mat,t,aux);
-      r = fscanf(fp,"%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
+      r = fscanf(fp,"%d %f %d %d %d %d %s\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
    }
    free(aux);
    fclose(fp);
@@ -520,16 +518,40 @@ int main () {
       case 5:
 		{
 			int op;
+			int mat;
 			printf("1- cr; 2- carga horária; 3- trancamento; 4- períodos;");
 			do{
 				printf("Digite o que deseja Alterar : ");
 				scanf("%d", &op);
 			}while(op<1||op>4);
 			printf("Digite a matricula do aluno a ser alterado : ");
+			scanf("%d", &mat);
 			switch(op)
 			{
 					case 1:
-							printf("Digite a ");
+							{
+								float cr;
+								printf("Digite o cr : ");
+								scanf("%f", &cr);
+								arvore=alteraCR(arvore,t,k,cr);
+								imprime(arvore);
+								break;
+							}
+					case 2:
+							{
+								int carOraria;
+								printf("Digite a Carga Horaria : ");
+								scanf("%d", &carOraria);
+								arvore=alteraCH(arvore,t,k,carOraria);
+								imprime(arvore);
+								break;	
+							}
+					case 3:
+							{
+									
+							}
+					case 4:			
+
 			}
         	// 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
 			// 
