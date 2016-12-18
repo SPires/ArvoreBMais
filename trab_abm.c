@@ -259,11 +259,16 @@ TABM *Insere(TABM *a, int k, int t, TREG *dado){
   return a;
 }
 
+TABM * removeFormandos (TABM *a, int t);
+TABM * removePeloTempoDeCurso (TABM *a, int t);
+
 TABM * otimizaArvore(TABM *a, int t){
     if(!a) return NULL;
-    a = removeFormandos(a,t); 
-    a = removePeloTempoDeCurso(a,t);
-    return t;
+	TABM *nova = (TABM*) malloc (sizeof(TABM*));
+	nova = a;
+    nova = removeFormandos(nova,t); 
+    nova = removePeloTempoDeCurso(nova,t);
+    return nova;
    }
 
 TABM * removeFormandos(TABM * a, int t){
