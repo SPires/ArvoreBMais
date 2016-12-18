@@ -16,19 +16,19 @@ typedef struct reg {
 } TREG;
   
 TABM *Cria(int t){
-  TAB* novo = (TAB *) malloc (sizeof(TAB));
+  TABM* novo = (TABM *) malloc (sizeof(TABM));
   novo->nchaves = 0;
   novo->chave = (int *) malloc (sizeof(int*)*((t*2)-1));
   novo->folha = 1;
   novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1)); //hmmmmm
-  novo->filho = (TAB **) malloc (sizeof(TAB*)*t*2);
+  novo->filho = (TABM **) malloc (sizeof(TABM*)*t*2);
   novo->prox = (TABM *) malloc (sizeof(TABM*));
   int i;
   for(i=0; i<(t*2); i++) novo->filho[i] = NULL;
   return novo;
 }
 
-TABM *Libera(TABM *a){
+void Libera(TABM *a){
   if(a){
     if(!a->folha){
       int i;
@@ -39,7 +39,6 @@ TABM *Libera(TABM *a){
     free(a->info);
     free(a->prox);
     free(a);
-    return NULL;
   }
 }
 
@@ -386,7 +385,7 @@ int gravarDados (TABM *a, char *saida){
   return 1;
 }
 
-void imprimeinfo(TREG* r)
+void imprimeinfo(TREG* t)
 {
     printf("%d ",t->mat);
     printf("%f ",t->cr);
@@ -428,7 +427,7 @@ void imprime(TABM* t)
 }
   
   
-int main (int argc, char** argv) {
+int main () {
   int op=-1;
   int t=-1;
   TABM* arvore=NULL;
@@ -445,84 +444,109 @@ int main (int argc, char** argv) {
       printf("5 - alterar\n");
       printf("6 - mostrar arvore\n");
       printf("9 - escrever arvore no arquivo\n");
-    }while(op<0||(op!=9&&op>6))
+    }while(op<0||(op!=9&&op>6));
     switch(op)
     {
       case 0:
         return 0;
         break;
       case 1:
-        char nome[501];
-        printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
-        scanf("%500[^\n]",nome);
-        fflush(stdin);
-        printf("Digite o t : ");
-        scanf("%d",&t);
-        if(arvore)
-           Libera(arvore);
-        arvore=novaArv(nome,t);
-        imprime(arvore);
-        break;
+		{
+        	char nome[501];
+        	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+        	scanf("%500[^\n]",nome);
+        	fflush(stdin);
+        	printf("Digite o t : ");
+        	scanf("%d",&t);
+        	if(arvore)
+           		Libera(arvore);
+        	arvore=novaArv(nome,t);
+        	imprime(arvore);
+        	break;
+		}
       case 2:
-        TREG* novo=(TREG*)calloc(sizeof(TREG),1);
-        int mat=-1;
-        float cr=-1;
-        int tranc=0;
-        int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
-        char *nome=(char*)calloc(sizeof(char),101);
-        if(!novo || !nome)
-        {
-          fprintf(stderr,"%s:%d alocacao de memoria falhou, libere memoria \n", __FILE__, __LINE__);
-          break;
-        }
-        printf("Digite a matricula : ");
-        scanf("%d",&mat);
-        printf("Digite o cr : ");
-        scanf("%f", &cr);
-        printf("Digite o numero de trancamentos : ");
-        scanf("%d", &tranc);
-        printf("Digite a carga horaria aprovada : ");
-        scanf("%d", &ch_aprov);
-        printf("Digite o numero de periodos : ");
-        scanf("%d", &periodos);
-        printf("Digite o numero do curriculo : ");
-        scanf("%d", &cur);
-        printf("Digite o nome do candidato (tamanho maximo de 100 caracteres, os excedentes serao ignorados : ");
-        scanf("%100[^\n]", nome);
-        novo->mat=mat;
-        novo->cr=cr;
-        novo->tranc=tranc;
-        novo->ch_aprov=ch_aprov;
-        novo->periodos=periodos;
-        novo->cur=cur;
-        novo->nome=nome;
-        arvore=insere(arvore,mat,t,novo);
-        imprime(arvore);
-        break;
+		{
+        	TREG* novo=(TREG*)calloc(sizeof(TREG),1);
+        	int mat=-1;
+        	float cr=-1;
+        	int tranc=0;
+        	int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
+        	char *nomeCandidato=(char*)calloc(sizeof(char),101);
+        	if(!novo || !nomeCandidato)
+        	{
+          		fprintf(stderr,"%s:%d alocacao de memoria falhou, libere memoria \n", __FILE__, __LINE__);
+          		break;
+        	}
+        	printf("Digite a matricula : ");
+        	scanf("%d",&mat);
+        	printf("Digite o cr : ");
+        	scanf("%f", &cr);
+        	printf("Digite o numero de trancamentos : ");
+        	scanf("%d", &tranc);
+        	printf("Digite a carga horaria aprovada : ");
+        	scanf("%d", &ch_aprov);
+        	printf("Digite o numero de periodos : ");
+        	scanf("%d", &periodos);
+        	printf("Digite o numero do curriculo : ");
+       		scanf("%d", &cur);
+        	printf("Digite o nome do candidato (tamanho maximo de 100 caracteres, os excedentes serao ignorados : ");
+        	scanf("%100[^\n]", nomeCandidato);
+        	novo->mat=mat;
+        	novo->cr=cr;
+        	novo->tranc=tranc;
+        	novo->ch_aprov=ch_aprov;
+        	novo->periodos=periodos;
+        	novo->cur=cur;
+        	novo->nome=nomeCandidato;
+        	arvore=Insere(arvore,mat,t,novo);
+        	imprime(arvore);
+        	break;
+		}
       case 3:
-        int mat;
-        printf("Digite a matricula a remover : ");
-        scanf("%d", &mat);
-        arvore=retira(arvore,mat,t);
-        imprime(arvore);
-        break;
+		{
+        	int mat;
+        	printf("Digite a matricula a remover : ");
+        	scanf("%d", &mat);
+        	arvore=retira(arvore,mat,t);
+        	imprime(arvore);
+
+        	break;
+		}
       case 4:
-        arvore=otimiza(arvore);
+        arvore=otimizaArvore(arvore,t);
         imprime(arvore);
         break;
       case 5:
-        // 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
+		{
+			int op;
+			printf("1- cr; 2- carga horária; 3- trancamento; 4- períodos;");
+			do{
+				printf("Digite o que deseja Alterar : ");
+				scanf("%d", &op);
+			}while(op<1||op>4);
+			printf("Digite a matricula do aluno a ser alterado : ");
+			switch(op)
+			{
+					case 1:
+							printf("Digite a ");
+			}
+        	// 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
+			// 
+		}
       case 6:
         imprime(arvore);
         break;
       case 9:
-        char nome[501];
-        printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
-        scanf("%500[^\n]",nome);
-        fflush(stdin);
-        gravar(arvore,nome);
+		{
+        	char nomeArquivo[501];
+        	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+        	scanf("%500[^\n]",nomeArquivo);
+        	fflush(stdin);
+        	gravarDados(arvore,nomeArquivo);
+			break;
+		}
     }
-  }
+  }}
 //códigos para chama de funções
 // 0 - sair
 // 1- carregar a base de dados.
