@@ -497,6 +497,7 @@ int main () {
       printf("5 - alterar\n");
       printf("6 - mostrar arvore\n");
       printf("9 - escrever arvore no arquivo\n");
+      scanf("%d",&op);	    
     }while(op<0||(op!=9&&op>6));
     switch(op)
     {
