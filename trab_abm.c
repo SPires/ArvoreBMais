@@ -62,12 +62,13 @@ TABM* retira(TABM* arv, int k, int t){
   return remover(arv, k, t);
 }    
     
+
 TABM* remover(TABM* arv, int ch, int t){
   if(!arv) return arv;
   int i;
   printf("Removendo %d...\n", ch);
   for(i = 0; i<arv->nchaves && arv->chave[i] < ch; i++);
-  
+	
   if(i < arv->nchaves && ch == arv->chave[i]){ //   CASO 1
     if(arv->folha){ 
       printf("\nCASO 1\n");
@@ -76,21 +77,23 @@ TABM* remover(TABM* arv, int ch, int t){
         arv->chave[j] = arv->chave[j+1];
         arv->info[j] = arv->info[j+1];
       }
+      arv->prox[i-1] = arv-chave[i];    
       arv->nchaves--;
       return arv;      
     }     
   }
   TABM *y = arv->filho[i], *z = NULL;
+	
   if (y->nchaves == t-1){ //CASOS 3A e 3B
-    if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){ //CASO 3A
+    if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){ //CASO 3A: Chave está no MEIO/ESQUERDA(y) = T-1, DIREITA(z) = T 
       printf("\nCASO 3A: i menor que nchaves\n");
       z = arv->filho[i+1];
-      y->chave[t-1] = z->chave[0];   //dar a y a chave i da arv
+      y->chave[t-1] = z->chave[0];   //dar a y a chave 0 de z
       y->info[t-1] = z->info[0];
       y->nchaves++;
-      arv->chave[i] = z->chave[1];
+      arv->chave[i] = z->chave[1]; //arv fica com o valor de chave igual ao primeiro elemento do filho da direita
       int j;
-      for(j=0; j < z->nchaves-1; j++){
+      for(j=0; j < z->nchaves-1; j++){ //ajusa as chaves de z, movendo seus elementos para a esquerda
         z->chave[j] = z->chave[j+1];
         z->info[j] = z->info[j+1];
       }
@@ -100,12 +103,12 @@ TABM* remover(TABM* arv, int ch, int t){
       z->nchaves--;
       arv->filho[i] = remover(arv->filho[i], ch, t);
       return arv;
-    }
-    if((i > 0) && (!z) && (arv->filho[i-1]->nchaves >=t)){ //CASO 3A
+   }
+    if((i > 0) && (!z) && (arv->filho[i-1]->nchaves >=t)){ //CASO 3A: ESQUERDA(z) = T, DIREITA/MEIO(y) = T-1
       printf("\nCASO 3A: i igual a nchaves\n");
       z = arv->filho[i-1];
       int j;
-      for(j = y->nchaves; j>0; j--) {              //encaixar lugar da nova chave
+      for(j = y->nchaves; j>0; j--) {              //move as posições para abrir espaço pra nova chave
         y->chave[j] = y->chave[j-1];
         y->info[j] = y->info[j-1];
       }
@@ -114,31 +117,32 @@ TABM* remover(TABM* arv, int ch, int t){
       y->chave[0] = z->chave[z->nchaves-1];
       y->info[0] = z->chave[z->nchaves-1];
       y->nchaves++;
-      arv->chave[i-1] = y->chave[0];
-      y->filho[0] = z->filho[z->nchaves];         //enviar ponteiro de z para o novo elemento em y
+      arv->chave[i-1] = y->chave[0]; 	          //recebe o valor da chave do filho da direita
+      y->filho[0] = z->filho[z->nchaves];         //enviar ponteiro do último elemento de z para o novo elemento em y
       z->nchaves--;
       arv->filho[i] = remover(y, ch, t);
       return arv;
     }
     
     if(!z){ //CASO 3B
-      if(i < arv->nchaves && arv->filho[i+1]->nchaves == t-1){
+      if(i < arv->nchaves && arv->filho[i+1]->nchaves == t-1){  //filho da direita tem t-1 chaves
         printf("\nCASO 3B: i menor que nchaves\n");
         z = arv->filho[i+1];
-        //y->chave[t-1] = arv->chave[i];     //pegar chave [i] e coloca ao final de filho[i]
-        //y->nchaves++;
         int j;
+	y->chave[t-1] = z->chave[0]; 
+	y->info[t-1] = z->info[0];
+	y->nchaves++;
         for(j=0; j < t-1; j++){
-          y->chave[t-1+j] = z->chave[j];     //passar filho[i+1] para filho[i]
-          y->info[t-1+j] = z->info[j];
+          y->chave[t+j] = z->chave[j+1];     //passar chave do filho da direita pro nó do filho da esquerda
+          y->info[t+j] = z->info[j+1];
 	  y->nchaves++;
         }
         if(!y->folha){
           for(j=0; j<t; j++){
-            y->filho[t-1+j] = z->filho[j];
+            y->filho[t-1+j] = z->filho[j];    //passa a referência dos filhos
           }
         }
-        for(j=i; j < arv->nchaves-1; j++){ //limpar referÃªncias de i
+        for(j=i; j < arv->nchaves-1; j++){    //hmmmm...... 
           arv->chave[j] = arv->chave[j+1];
           arv->filho[j+1] = arv->filho[j+2];
         }
@@ -146,7 +150,9 @@ TABM* remover(TABM* arv, int ch, int t){
         arv = remover(arv, ch, t);
         return arv;
       }
-      if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ 
+
+      //acho que não entendi esse caso	    
+      if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ //filho da esquerda tem t-1 chaves??     
         printf("\nCASO 3B: i igual a nchaves\n");
         z = arv->filho[i-1];
         //if(i == arv->nchaves)
