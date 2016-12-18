@@ -181,8 +181,8 @@ TABM* remover(TABM* arv, int ch, int t){
   return arv;
 }
 
-TAB *Divisao(TAB *x, int i, TAB* y, int t){
-  TAB *z=Cria(t);
+TABM *Divisao(TABM *x, int i, TABM* y, int t){
+  TABM *z=Cria(t);
   z->nchaves= t - 1;
   z->folha = y->folha;
   int j;
@@ -208,7 +208,7 @@ TAB *Divisao(TAB *x, int i, TAB* y, int t){
   return x;
 }
 
-TAB *Insere_Nao_Completo(TAB *x, int k, int t, TREG *dado){
+TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   int i = x->nchaves-1;
   if(x->folha){
     while((i>=0) && (k<x->chave[i])){
