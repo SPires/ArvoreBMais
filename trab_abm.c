@@ -56,7 +56,8 @@ TABM *Busca(TABM* x, int ch){
   return Busca(x->filho[i],ch);
 }
     
-    
+TABM* remover(TABM* arv, int ch, int t);
+
 TABM* retira(TABM* arv, int k, int t){
   if(!arv || !Busca(arv, k)) return arv;
   return remover(arv, k, t);
@@ -555,10 +556,22 @@ int main () {
 							}
 					case 3:
 							{
-									
+									int tranc;
+									printf("Digite o numero de trancamentos : ");
+									scanf("%d", &tranc);
+									arvore=alteraTranc(arvore,t,k,tranc);
+									imprime(arvore);
+									break;
 							}
 					case 4:			
-
+							{
+									int periodos;
+									printf("Digite o numero de periodos : ");
+									scanf("%d", &periodos);
+									arvore=alteraPeriodo(arvore,t,k,periodos);
+									imprime(arvore);
+									break;
+							}
 			}
         	// 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
 			// 
