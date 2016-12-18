@@ -63,7 +63,6 @@ TABM* retira(TABM* arv, int k, int t){
   return remover(arv, k, t);
 }    
     
-
 TABM* remover(TABM* arv, int ch, int t){
   if(!arv) return arv;
   int i;
@@ -78,7 +77,6 @@ TABM* remover(TABM* arv, int ch, int t){
         arv->chave[j] = arv->chave[j+1];
         arv->info[j] = arv->info[j+1];
       }
-      arv->prox[i-1] = arv->chave[i];  //Prox[i-1] e  chave[i] sao de tipos diferentes, nao????
       arv->nchaves--;
       return arv;      
     }     
@@ -116,7 +114,7 @@ TABM* remover(TABM* arv, int ch, int t){
       for(j = y->nchaves+1; j>0; j--)             //encaixar lugar dos filhos da nova chave
         y->filho[j] = y->filho[j-1];
       y->chave[0] = z->chave[z->nchaves-1];
-      y->info[0] = z->chave[z->nchaves-1];
+      y->info[0] = z->info[z->nchaves-1];
       y->nchaves++;
       arv->chave[i-1] = y->chave[0]; 	          //recebe o valor da chave do filho da direita
       y->filho[0] = z->filho[z->nchaves];         //enviar ponteiro do último elemento de z para o novo elemento em y
@@ -182,10 +180,58 @@ TABM* remover(TABM* arv, int ch, int t){
   arv->filho[i] = remover(arv->filho[i], ch, t);
   return arv;
 }
-    
-  
-  // obssssssss
- TABM *Insere(TABM *a, int k, int t, TREG *dado){
+
+TAB *Divisao(TAB *x, int i, TAB* y, int t){
+  TAB *z=Cria(t);
+  z->nchaves= t - 1;
+  z->folha = y->folha;
+  int j;
+  if (y->folha){
+	for(j=0;j<t-1;j++){
+	  z->chave[j] = y->chave[j+t];
+	  z->info[j] = y->info[j+t];
+    }
+  }
+  for(j=0;j<t-1;j++) z->chave[j] = y->chave[j+t];
+  if(!y->folha){
+    for(j=0;j<t;j++){
+      z->filho[j] = y->filho[j+t];
+      y->filho[j+t] = NULL;
+    }
+  }
+  y->nchaves = t-1;
+  for(j=x->nchaves; j>=i; j--) x->filho[j+1]=x->filho[j];
+  x->filho[i] = z;
+  for(j=x->nchaves; j>=i; j--) x->chave[j] = x->chave[j-1];
+  x->chave[i-1] = y->chave[t-1];
+  x->nchaves++;
+  return x;
+}
+
+TAB *Insere_Nao_Completo(TAB *x, int k, int t, TREG *dado){
+  int i = x->nchaves-1;
+  if(x->folha){
+    while((i>=0) && (k<x->chave[i])){
+      x->chave[i+1] = x->chave[i];
+	  x->chave[i+1] = x->info[i];
+      i--;
+    }
+    x->chave[i+1] = k;
+	x->info[i+1] = dado;
+    x->nchaves++;
+    return x;
+  }
+  while((i>=0) && (k<x->chave[i])) i--;
+  i++;
+  if(x->filho[i]->nchaves == ((2*t)-1)){
+    x = Divisao(x, (i+1), x->filho[i], t);
+    if(k>x->chave[i]) i++;
+  }
+  x->filho[i] = Insere_Nao_Completo(x->filho[i], k, t, dado);
+  return x;
+} 
+
+TABM *Insere(TABM *a, int k, int t, TREG *dado){
   if(Busca(a,k)){
     int i;
     while (k > a->chave[i]) i++;
@@ -212,18 +258,15 @@ TABM* remover(TABM* arv, int ch, int t){
   a = Insere_Nao_Completo(a,k,t,info);
   return a;
 }
-  
-  //função que vai chamar as outras funções que vão executar algum tipo atualização na árvore
-  TABM * otimizaArvore(TABM *a, int t){
+
+TABM * otimizaArvore(TABM *a, int t){
     if(!a) return NULL;
     a = removeFormandos(a,t); 
     a = removePeloTempoDeCurso(a,t);
     return t;
    }
-    
-  //remove todos os registros com: - CHCS = TNC e CHCS < 50% de CHT
-  //                               - CHCS = NTOTPER e CHCS < CHT  
-  TABM * removeFormandos(TABM * a, int t){
+
+TABM * removeFormandos(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM*));
     if (!a->folha) a = primeiraFolha(a);
@@ -242,9 +285,8 @@ TABM* remover(TABM* arv, int ch, int t){
     free(aux);
     return a;
   }  
-    
-  //remove todos os registros com NPU NTOTPER 
-  TABM * removePeloTempoDeCurso(TABM * a, int t){
+
+TABM * removePeloTempoDeCurso(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM*));
     if (!a->folha) a = primeiraFolha(a);
@@ -278,8 +320,7 @@ TABM* remover(TABM* arv, int ch, int t){
     free(aux);
     return a;
   }
-  
- 
+
 TABM * primeiraFolha (TABM* t){
   if (!t) return NULL;
   if (t->folha) return t;
