@@ -401,8 +401,9 @@ TABM * novaArv (char *nome, int t){
    if (!fp) exit(1);
    TABM *a = Cria(t);
    TREG *aux = (TREG *) malloc (sizeof(TREG*));
+
    int r = fscanf(fp,"%d %f %d %d %d %d %s\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
-   while (r != -1){
+   while (r == 7){
       a = Insere(a,aux->mat,t,aux);
       r = fscanf(fp,"%d %f %d %d %d %d %s\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
    }
@@ -497,6 +498,8 @@ int main () {
       printf("5 - alterar\n");
       printf("6 - mostrar arvore\n");
       printf("9 - escrever arvore no arquivo\n");
+	  scanf("%d", &op);
+	  fflush(stdin);
     }while(op<0||(op!=9&&op>6));
     switch(op)
     {
@@ -507,13 +510,15 @@ int main () {
 		{
         	char nome[501];
         	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
-        	scanf("%500[^\n]",nome);
-        	fflush(stdin);
+ 	      	scanf("%s",nome);
+			fflush(stdin);
         	printf("Digite o t : ");
         	scanf("%d",&t);
+			fflush(stdin);
         	if(arvore)
            		Libera(arvore);
         	arvore=novaArv(nome,t);
+			printf("Carreguei a arvore\n");
         	imprime(arvore);
         	break;
 		}
