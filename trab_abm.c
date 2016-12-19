@@ -423,13 +423,18 @@ int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* perio
 TABM * novaArv (char *nome, int t){
    FILE *fp = fopen(nome,"rt");
    if (!fp) exit(1);
+   printf("fp existe\n");
    TABM *a = Cria(t);
+   printf("a é criada com valor %p\n", a);
    TREG *aux = (TREG *) malloc (sizeof(TREG));
-
+   printf("aux é alocado com valor %p\n", aux);
    int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
+   printf("Terminou de Parsear a primeira linha com r = %d\n", r);
    while (r == 7){
       a = Insere(a,aux->mat,t,aux);
+      printf("Inseri Porra com a = %p\n", a);
       r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
+      printf("parseei de novo com r = %d\n", r);
    }
    free(aux);
    fclose(fp);
@@ -535,10 +540,8 @@ int main () {
         	char nome[501];
         	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
  	      	scanf("%s",nome);
-			fflush(stdin);
         	printf("Digite o t : ");
         	scanf("%d",&t);
-			fflush(stdin);
         	if(arvore)
            		Libera(arvore);
         	arvore=novaArv(nome,t);
