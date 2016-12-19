@@ -1,5 +1,6 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct arvbm {
   int *chave , nchaves, folha;
@@ -396,16 +397,39 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
   return a;
 }
 
+#define MAXTAMLINE 1001
+
+int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* periodos, int* cur, char** nome)
+{
+	char linha[MAXTAMLINE+1+1];
+	char *aux;
+	fgets(linha,MAXTAMLINE+1,fp);
+	aux=strtok(linha," ");
+	if(aux==NULL) return 0;
+	*mat=atoi(aux);
+	aux=strtok(NULL," ");
+	*cr=atof(aux);
+	aux=strtok(NULL," ");
+	*tranc=atoi(aux);
+	aux=strtok(NULL," ");
+	*ch_aprov=atoi(aux);
+	aux=strtok(NULL," ");
+	*periodos=atoi(aux);
+	aux=strtok(NULL, " ");
+	*cur=atoi(aux);
+	*nome=strtok(NULL,"\n");
+	return 7;
+}
 TABM * novaArv (char *nome, int t){
    FILE *fp = fopen(nome,"rt");
    if (!fp) exit(1);
    TABM *a = Cria(t);
    TREG *aux = (TREG *) malloc (sizeof(TREG));
 
-   int r = fscanf(fp,"%d %f %d %d %d %d %[^\n]\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
+   int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
    while (r == 7){
       a = Insere(a,aux->mat,t,aux);
-      r = fscanf(fp,"%d %f %d %d %d %d %s\n",&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,aux->nome);
+      r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
    }
    free(aux);
    fclose(fp);
