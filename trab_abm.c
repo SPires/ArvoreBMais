@@ -15,7 +15,11 @@ typedef struct reg {
   int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
   char *nome;
 } TREG;
-  
+ 
+
+void imprime(TABM* a);
+
+ 
 TABM *Cria(int t){
   TABM* novo = (TABM *) malloc (sizeof(TABM));
   novo->nchaves = 0;
@@ -53,7 +57,7 @@ TABM *Busca(TABM* x, int ch){
 			resp = x;
 	return resp;
   }
-  while(ch > x->chave[i]) i++;
+  while(ch > x->chave[i] && i<x->nchaves) i++;
   return Busca(x->filho[i],ch);
 }
     
@@ -234,20 +238,32 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
 
 TABM *Insere(TABM *a, int k, int t, TREG *dado){
   if(Busca(a,k)){
-    int i;
+    printf("Entrou na Busca\n");
+    int i=0;
     while (k > a->chave[i]) i++;
     a->info[i] = dado;
     return a;
   }
   if(!a){
+    printf("a é NULL\n");
     a = Cria(t);
     a->chave[0] = k;
     a->folha = 1;
     a->nchaves = 1;
+    a->info[0]->mat=dado->mat;
+    a->info[0]->cr=dado->cr;
+    a->info[0]->tranc=dado->tranc;
+    a->info[0]->ch_aprov=dado->ch_aprov;
+    a->info[0]->periodos=dado->periodos;
+    a->info[0]->cur=dado->cur;
+    printf("copiei Inicio\n");
+    strcpy(a->info[0]->nome,dado->nome);
+    printf("copiei FInal\n");
     a->info[0] = dado;
     return a;
   }
   if(a->nchaves == (2*t)-1){
+    printf("a ta cheio\n");
     TABM *S = Cria(t);
     S->nchaves=0;
     S->folha = 0;
@@ -256,7 +272,9 @@ TABM *Insere(TABM *a, int k, int t, TREG *dado){
     S = Insere_Nao_Completo(S,k,t,dado);
     return S;
   }
+  printf("Insere nao completo\n");
   a = Insere_Nao_Completo(a,k,t,dado);
+  printf("Insere não completo terminado\n");
   return a;
 }
 
@@ -431,13 +449,16 @@ TABM * novaArv (char *nome, int t){
    int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
    printf("Terminou de Parsear a primeira linha com r = %d\n", r);
    while (r == 7){
+      imprime(a);
       a = Insere(a,aux->mat,t,aux);
       printf("Inseri Porra com a = %p\n", a);
       r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
       printf("parseei de novo com r = %d\n", r);
    }
+   printf("Começo do fim da função\n");
    free(aux);
    fclose(fp);
+   printf("FIm da função\n");
    return a;
 }
 
