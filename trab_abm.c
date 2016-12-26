@@ -15,9 +15,25 @@ typedef struct reg {
   int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
   char *nome;
 } TREG;
- 
 
-void imprime(TABM* a);
+/* Impressão da árvore
+ * parametros : 
+ * a: nó raiz da arvore
+ * andar: nível de impressão da árvore. Segundo o código dela, sempre passar como 0.
+ *
+ * retorno: nenhum */
+
+void Imprime(TABM *a, int andar){
+  if(a){
+    int i,j;
+    for(i=0; i<=a->nchaves-1; i++){
+      Imprime(a->filho[i],andar+1);
+      for(j=0; j<=andar; j++) printf("   ");
+      printf("%d\n", a->chave[i]);
+    }
+    Imprime(a->filho[i],andar+1);
+  }
+}
 
  
 TABM *Cria(int t){
@@ -254,11 +270,19 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
  *
  * */
 TABM *Insere(TABM *a, int k, int t, TREG *dado){
-  if(Busca(a,k)){
+  //A ideia é sobrescrever os dados do registro
+  if (Busca(a,k)){
     printf("Entrou na Busca\n");
     int i=0;
     while (k > a->chave[i] && i<a->numchaves) i++;
-    a->info[i] = dado;
+    a->info[i]->mat = dado->mat;
+    a->info[i]->cr = dado->cr;
+    a->info[i]->tranc = dado->tranc;
+    a->info[i]->ch_aprov = dado->ch_aprov;
+    a->info[i]->periodos = dado->periodos;
+    a->info[i]->cur = dado->cur;
+    strcpy(a->info[0]->nome,dado->nome);
+    printf("Funcionou?\n");
     return a;
   }
   if(!a){
