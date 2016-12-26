@@ -546,39 +546,7 @@ void imprimeinfo(TREG* t)
     printf("%s ",t->nome);
 }
   
-  
-void imprime(TABM* t)
-{
-  if(t)
-  {
-    printf("(");
-    if(t->folha)
-    {
-      int i;
-      for(i=0; i<t->nchaves; i++)
-      {
-        imprimeinfo(t->info[i]);
-        printf(" ");
-      }
-    }
-    else
-    {
-      int i;
-      for(i=0; i<t->nchaves; i++)
-      {
-        imprime(t->filho[i]);
-        printf(":");
-        printf("%d:",t->chave[i]);
-        printf(":");
-      
-      }
-      imprime(t->filho[i]);
-    }
-    printf(")");
-  }
-}
-  
-  
+
 int main () {
   int op=-1;
   int t=-1;
@@ -595,6 +563,7 @@ int main () {
       printf("4 - otimizar a árvore\n");
       printf("5 - alterar\n");
       printf("6 - mostrar arvore\n");
+      printf("7 - exibir informações\n"); //Implementar esta parte.
       printf("9 - escrever arvore no arquivo\n");
 	  scanf("%d", &op);
 	  fflush(stdin);
