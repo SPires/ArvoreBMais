@@ -47,10 +47,18 @@ void Libera(TABM *a){
   }
 }
 
+
+/* busca verifica se uma dada chave esta numa arvore
+ * parametros : 
+ * x: nó raiz da arvore em que será feita a busca
+ * ch: chave a ser procurada
+ *
+ * retorno: o nó em que foi encontrada a chave ou NULL, caso nao encontre  */
+ 
 TABM *Busca(TABM* x, int ch){
   TABM *resp = NULL;
   if(!x) return resp;
-  int i;
+  int i=0;
   if (x->folha==1){
   	for(i=0;i<x->nchaves;i++)
 		if (x->chave[i]==ch)
@@ -236,11 +244,20 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   return x;
 } 
 
+
+/*
+ *parametros
+ *a: arvore na qual será inserido o novo registro
+ *k: matricula do registro a ser inserido
+ *t: ordem da arvore a
+ *dado: o dado a ser inserido 
+ *
+ * */
 TABM *Insere(TABM *a, int k, int t, TREG *dado){
   if(Busca(a,k)){
     printf("Entrou na Busca\n");
     int i=0;
-    while (k > a->chave[i]) i++;
+    while (k > a->chave[i] && i<a->numchaves) i++;
     a->info[i] = dado;
     return a;
   }
@@ -345,6 +362,13 @@ TABM * removePeloTempoDeCurso(TABM * a, int t){
     return a;
   }
 
+
+/*
+ *parametros
+ *t: nó ancestral do nó folha procurado ou o proprio nó folha
+ *
+ *retorno: NULL se a arvore for nula, e t caso t seja folha
+ */
 TABM * primeiraFolha (TABM* t){
   if (!t) return NULL;
   if (t->folha) return t;
