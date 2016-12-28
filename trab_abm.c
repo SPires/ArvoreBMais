@@ -274,7 +274,7 @@ TABM *Insere(TABM *a, int k, int t, TREG *dado){
   if (Busca(a,k)){
     printf("Entrou na Busca\n");
     int i=0;
-    while (k > a->chave[i] && i<a->numchaves) i++;
+    while (k > a->chave[i] && i<a->nchaves) i++;
     a->info[i]->mat = dado->mat;
     a->info[i]->cr = dado->cr;
     a->info[i]->tranc = dado->tranc;
@@ -497,7 +497,7 @@ TABM * novaArv (char *nome, int t){
    int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
    printf("Terminou de Parsear a primeira linha com r = %d\n", r);
    while (r == 7){
-      imprime(a);
+      Imprime(a,0);
       a = Insere(a,aux->mat,t,aux);
       printf("Inseri Porra com a = %p\n", a);
       r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
@@ -563,7 +563,7 @@ int main () {
       printf("4 - otimizar a árvore\n");
       printf("5 - alterar\n");
       printf("6 - mostrar arvore\n");
-      printf("7 - exibir informações\n"); //Implementar esta parte.
+      printf("7 - exibir informações\n");
       printf("9 - escrever arvore no arquivo\n");
 	  scanf("%d", &op);
 	  fflush(stdin);
@@ -584,7 +584,7 @@ int main () {
            		Libera(arvore);
         	arvore=novaArv(nome,t);
 			printf("Carreguei a arvore\n");
-        	imprime(arvore);
+        	Imprime(arvore,0);
         	break;
 		}
       case 2:
@@ -622,7 +622,7 @@ int main () {
         	novo->cur=cur;
         	novo->nome=nomeCandidato;
         	arvore=Insere(arvore,mat,t,novo);
-        	imprime(arvore);
+        	Imprime(arvore,0);
         	break;
 		}
       case 3:
@@ -631,13 +631,13 @@ int main () {
         	printf("Digite a matricula a remover : ");
         	scanf("%d", &mat);
         	arvore=retira(arvore,mat,t);
-        	imprime(arvore);
+        	Imprime(arvore,0);
 
         	break;
 		}
       case 4:
         arvore=otimizaArvore(arvore,t);
-        imprime(arvore);
+        Imprime(arvore,0);
         break;
       case 5:
 		{
@@ -658,7 +658,7 @@ int main () {
 								printf("Digite o cr : ");
 								scanf("%f", &cr);
 								arvore=alteraCR(arvore,t,mat,cr);
-								imprime(arvore);
+								Imprime(arvore,0);
 								break;
 							}
 					case 2:
@@ -667,7 +667,7 @@ int main () {
 								printf("Digite a Carga Horaria : ");
 								scanf("%d", &carOraria);
 								arvore=alteraCH(arvore,t,mat,carOraria);
-								imprime(arvore);
+								Imprime(arvore,0);
 								break;	
 							}
 					case 3:
@@ -676,7 +676,7 @@ int main () {
 									printf("Digite o numero de trancamentos : ");
 									scanf("%d", &tranc);
 									arvore=alteraTranc(arvore,t,mat,tranc);
-									imprime(arvore);
+									Imprime(arvore,0);
 									break;
 							}
 					case 4:			
@@ -685,7 +685,7 @@ int main () {
 									printf("Digite o numero de periodos : ");
 									scanf("%d", &periodos);
 									arvore=alteraPeriodo(arvore,t,mat,periodos);
-									imprime(arvore);
+									Imprime(arvore,0);
 									break;
 							}
 			}
@@ -693,8 +693,22 @@ int main () {
 			// 
 		}
       case 6:
-        imprime(arvore);
+        Imprime(arvore,0);
         break;
+      case 7:
+	{
+	  printf("Digite a matrícula desejada:\n");
+	  int mat, ind;
+	  scanf("%d",&mat);
+	  TABM * no = (TABM*) malloc (sizeof(TABM));
+	  no = Busca(arvore,mat);
+	  for (ind=0; ind < no->nchaves; ind++){
+		if (no->chave[ind] == mat)
+			imprimeinfo(no->info[ind]);
+	  }
+	  free(no);
+	  break;
+	}
       case 9:
 		{
         	char nomeArquivo[501];
@@ -714,6 +728,7 @@ int main () {
 // 4- otimizar a árvore
 // 5- alterar: 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
 // 6- mostrar árvore
+// 7- exibir dados específicos.
 // 9- escrever árvore no arquivo.
 return 0;
 }
