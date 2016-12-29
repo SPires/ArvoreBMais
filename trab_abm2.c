@@ -44,10 +44,8 @@ TABM *Cria(int t){
   novo->filho = (TABM **) malloc (sizeof(TABM*)*t*2);  //vetor de filhos da árvore
   novo->prox = (TABM *) malloc (sizeof(TABM));
   int i;
-  for(i=0; i<(t*2); i++){
-      novo->filho[i] = NULL;
-      novo->info[i] = NULL;
-  }
+  for(i=0; i<(t*2); i++) novo->filho[i] = NULL;
+  for(i=0; i<((t*2)-1);i++) novo->info[i] = NULL;
   return novo;
 }
 
