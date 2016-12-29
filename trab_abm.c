@@ -251,6 +251,7 @@ TABM *Divisao(TABM *x, int i, TABM* y, int t){
 	  z->info[j] = y->info[j+t];
 	  y->info[j+t] = NULL;
     }
+	z->prox = y->prox;
 	y->prox = z;
   }
   for(j=0;j<t-1;j++) z->chave[j] = y->chave[j+t];
