@@ -1,14 +1,14 @@
 Marcar as funções que estão funcionando bem:
 
-Imprime:
-Cria:
+Imprime: OK
+Cria: OK
 Libera:
 Busca:
 remover:
 retira:
-Divisao:
-Insere_nao_completo:
-Insere:
+Divisao: OK
+Insere_nao_completo: OK
+Insere: OK
 removeFormandos:
 removePeloTempoDeCurso:
 primeiraFolha:
@@ -16,6 +16,7 @@ alteraCR:
 alteraCH:
 alteraTranc:
 alteraPeriodo:
+parseFile:
 novaArv:
 gravarDados:
 imprimeInfo:
