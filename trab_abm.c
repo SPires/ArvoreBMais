@@ -22,7 +22,6 @@ typedef struct reg {
  * andar: nível de impressão da árvore. Segundo o código dela, sempre passar como 0.
  *
  * retorno: nenhum */
-
 void Imprime(TABM *a, int andar){
   if(a){
     int i,j;
@@ -35,20 +34,31 @@ void Imprime(TABM *a, int andar){
   }
 }
 
- 
+/* Geração da árvore
+ * parametros : 
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */
 TABM *Cria(int t){
   TABM* novo = (TABM *) malloc (sizeof(TABM));
   novo->nchaves = 0;
   novo->chave = (int *) malloc (sizeof(int)*((t*2)-1));
   novo->folha = 1;
-  novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1)); //hmmmmm
+  novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1));
   novo->filho = (TABM **) malloc (sizeof(TABM*)*t*2);
   novo->prox = (TABM *) malloc (sizeof(TABM));
   int i;
   for(i=0; i<(t*2); i++) novo->filho[i] = NULL;
+  for(i=0; i<((2*t)-1); i++) novo->info[i] = NULL;
+  novo->prox = NULL;
   return novo;
 }
 
+/* Liberação da árvore
+ * parametros : 
+ * a: árvore pronta
+ *
+ * retorno: nada */
 void Libera(TABM *a){
   if(a){
     if(!a->folha){
@@ -63,14 +73,12 @@ void Libera(TABM *a){
   }
 }
 
-
 /* busca verifica se uma dada chave esta numa arvore
  * parametros : 
  * x: nó raiz da arvore em que será feita a busca
  * ch: chave a ser procurada
  *
  * retorno: o nó em que foi encontrada a chave ou NULL, caso nao encontre  */
- 
 TABM *Busca(TABM* x, int ch){
   TABM *resp = NULL;
   if(!x) return resp;
@@ -87,11 +95,25 @@ TABM *Busca(TABM* x, int ch){
     
 TABM* remover(TABM* arv, int ch, int t);
 
+/* Chamada segura à retirada
+ * parametros : 
+ * arv: árvore em uso
+ * k: a chave principal do registro a ser retirado
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */
 TABM* retira(TABM* arv, int k, int t){
   if(!arv || !Busca(arv, k)) return arv;
   return remover(arv, k, t);
 }    
-    
+
+/* Aplicação dos casos de remoção
+ * parametros : 
+ * arv: árvore em uso
+ * ch: chave principal a ser removida
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */ 
 TABM* remover(TABM* arv, int ch, int t){
   if(!arv) return arv;
   int i;
@@ -210,16 +232,26 @@ TABM* remover(TABM* arv, int ch, int t){
   return arv;
 }
 
+/* Aplicar divisão em nós cheios
+ *parametros
+ *x: nó pai
+ *i: posição onde entra o novo nó z
+ *y: a nova folha esquerda
+ *t: o fator de ramificação 
+ *
+ * retorno: uma nova árvore*/
 TABM *Divisao(TABM *x, int i, TABM* y, int t){
-  TABM *z=Cria(t);
-  z->nchaves= t - 1;
+  TABM *z = Cria(t);
+  z->nchaves = t-1;
   z->folha = y->folha;
   int j;
   if (y->folha){
 	for(j=0;j<t-1;j++){
 	  z->chave[j] = y->chave[j+t];
 	  z->info[j] = y->info[j+t];
+	  y->info[j+t] = NULL;
     }
+	y->prox = z;
   }
   for(j=0;j<t-1;j++) z->chave[j] = y->chave[j+t];
   if(!y->folha){
@@ -232,17 +264,26 @@ TABM *Divisao(TABM *x, int i, TABM* y, int t){
   for(j=x->nchaves; j>=i; j--) x->filho[j+1]=x->filho[j];
   x->filho[i] = z;
   for(j=x->nchaves; j>=i; j--) x->chave[j] = x->chave[j-1];
-  x->chave[i-1] = y->chave[t-1];
+  x->chave[i-1] = z->chave[0];
   x->nchaves++;
   return x;
 }
 
+/* Inserir dado em um nó não completo
+ * parametros : 
+ * x: árvore em uso
+ * k: chave a ser inserida
+ * t: fator de ramificação
+ * dado: informação associada à chave a ser inserida
+ *
+ * retorno: nova árvore */
 TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   int i = x->nchaves-1;
   if(x->folha){
     while((i>=0) && (k<x->chave[i])){
       x->chave[i+1] = x->chave[i];
 	  x->info[i+1] = x->info[i];
+	  x->info[i] = NULL;
       i--;
     }
     x->chave[i+1] = k;
@@ -260,68 +301,52 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   return x;
 } 
 
-
-/*
- *parametros
- *a: arvore na qual será inserido o novo registro
- *k: matricula do registro a ser inserido
- *t: ordem da arvore a
- *dado: o dado a ser inserido 
+/* Inserção
+ * parametros
+ * a: arvore na qual será inserido o novo registro
+ * k: matricula do registro a ser inserido
+ * t: ordem da arvore a
+ * dado: o dado a ser inserido 
  *
- * */
-TABM *Insere(TABM *a, int k, int t, TREG *dado){
-  //A ideia é sobrescrever os dados do registro
-  if (Busca(a,k)){
-    printf("Entrou na Busca\n");
-    int i=0;
-    while (k > a->chave[i] && i<a->nchaves) i++;
-    a->info[i]->mat = dado->mat;
-    a->info[i]->cr = dado->cr;
-    a->info[i]->tranc = dado->tranc;
-    a->info[i]->ch_aprov = dado->ch_aprov;
-    a->info[i]->periodos = dado->periodos;
-    a->info[i]->cur = dado->cur;
-    strcpy(a->info[0]->nome,dado->nome);
-    printf("Funcionou?\n");
-    return a;
-  }
-  if(!a){
-    printf("a é NULL\n");
-    a = Cria(t);
-    a->chave[0] = k;
-    a->folha = 1;
-    a->nchaves = 1;
-    a->info[0]->mat=dado->mat;
-    a->info[0]->cr=dado->cr;
-    a->info[0]->tranc=dado->tranc;
-    a->info[0]->ch_aprov=dado->ch_aprov;
-    a->info[0]->periodos=dado->periodos;
-    a->info[0]->cur=dado->cur;
-    printf("copiei Inicio\n");
-    strcpy(a->info[0]->nome,dado->nome);
-    printf("copiei FInal\n");
-    a->info[0] = dado;
-    return a;
-  }
-  if(a->nchaves == (2*t)-1){
-    printf("a ta cheio\n");
-    TABM *S = Cria(t);
-    S->nchaves=0;
-    S->folha = 0;
-    S->filho[0] = a;
-    S = Divisao(S,1,a,t);
-    S = Insere_Nao_Completo(S,k,t,dado);
-    return S;
-  }
-  printf("Insere nao completo\n");
-  a = Insere_Nao_Completo(a,k,t,dado);
-  printf("Insere não completo terminado\n");
-  return a;
+ * retorna: nova árvore*/
+ TABM *Insere(TABM *a, int k, int t, TREG *dado){
+	if (!a){
+		a = Cria(t);
+		a->folha = 1;
+		a->chave[0] = k;
+		a->info[0] = dado;
+		a->nchaves = 1;
+		return a;
+	}
+	TABM *aux = Busca(a,k);
+	if (aux){
+		int i=0;
+		while ((i<aux->nchaves) && (k>aux->chave[i])) i++;
+		aux->info[i] = dado;
+		return a;
+	}
+	if(a->nchaves == (2*t)-1){
+		TABM *S = Cria(t);
+		S->nchaves = 0;
+		S->folha = 0;
+		S->filho[0] = a;
+		S = Divisao(S,1,a,t);
+		S = Insere_Nao_Completo(S,k,t,dado);
+		return S;
+	}
+	a = Insere_Nao_Completo(a,k,t,dado);
+	printf("Insere não completo terminado\n");
+	return a;
 }
 
 TABM * removeFormandos (TABM *a, int t);
 TABM * removePeloTempoDeCurso (TABM *a, int t);
 
+/* Chamar as funções que eliminam dados da árvore
+ * parametros : 
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */
 TABM * otimizaArvore(TABM *a, int t){
     if(!a) return NULL;
     a = removeFormandos(a,t); 
@@ -386,19 +411,18 @@ TABM * removePeloTempoDeCurso(TABM * a, int t){
     return a;
   }
 
-
-/*
+/*Aponta para a folha mais à esquerda da árvore.
  *parametros
  *t: nó ancestral do nó folha procurado ou o proprio nó folha
  *
  *retorno: NULL se a arvore for nula, e t caso t seja folha
  */
-TABM * primeiraFolha (TABM* t){
+ TABM * primeiraFolha (TABM* t){
   if (!t) return NULL;
   if (t->folha) return t;
   return primeiraFolha(t->filho[0]);
 } 
-    
+
 TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
@@ -465,8 +489,7 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
 
 #define MAXTAMLINE 1001
 
-int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* periodos, int* cur, char** nome)
-{
+int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* periodos, int* cur, char** nome){
 	char linha[MAXTAMLINE+1+1];
 	char *aux;
 	fgets(linha,MAXTAMLINE+1,fp);
@@ -486,6 +509,12 @@ int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* perio
 	*nome=strtok(NULL,"\n");
 	return 7;
 }
+
+/* Gerar uma árvore a partir de dados de um arquivo
+ * parametros : 
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */
 TABM * novaArv (char *nome, int t){
    FILE *fp = fopen(nome,"rt");
    if (!fp) exit(1);
@@ -510,6 +539,11 @@ TABM * novaArv (char *nome, int t){
    return a;
 }
 
+/* Enviar os dados da árvore para um arquivo
+ * parametros : 
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */
 int gravarDados (TABM *a, char *saida){
   if (!a) return 0;
   FILE *fp = fopen(saida,"wt+");
@@ -537,8 +571,12 @@ int gravarDados (TABM *a, char *saida){
   return 1;
 }
 
-void imprimeinfo(TREG* t)
-{
+/* Exibir dados de um aluno específico
+ * parametros : 
+ * t: fator de ramificação
+ *
+ * retorno: nova árvore */
+void imprimeinfo(TREG* t){
     printf("%d ",t->mat);
     printf("%f ",t->cr);
     printf("%d ",t->tranc);
@@ -546,11 +584,10 @@ void imprimeinfo(TREG* t)
     printf("%s ",t->nome);
 }
   
-
 int main () {
-  int op=-1;
-  int t=-1;
-  TABM* arvore=NULL;
+  int op = -1;
+  int t = -1;
+  TABM *arvore = NULL;
   
   while(1)
   {
