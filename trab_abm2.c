@@ -40,11 +40,14 @@ TABM *Cria(int t){
   novo->nchaves = 0;
   novo->chave = (int *) malloc (sizeof(int)*((t*2)-1));
   novo->folha = 1;
-  novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1)); //hmmmmm
-  novo->filho = (TABM **) malloc (sizeof(TABM*)*t*2);
+  novo->info = (TREG **) malloc (sizeof(TREG*)*((t*2)-1)); //vetor de ponteiros de registro
+  novo->filho = (TABM **) malloc (sizeof(TABM*)*t*2);  //vetor de filhos da árvore
   novo->prox = (TABM *) malloc (sizeof(TABM));
   int i;
-  for(i=0; i<(t*2); i++) novo->filho[i] = NULL;
+  for(i=0; i<(t*2); i++){
+      novo->filho[i] = NULL;
+      novo->info[i] = NULL;
+  }
   return novo;
 }
 
