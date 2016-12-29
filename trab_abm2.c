@@ -55,6 +55,8 @@ void Libera(TABM *a){
       int i;
       for(i = 0; i <= a->nchaves; i++) Libera(a->filho[i]);
     }
+    int i;
+    for (i=0; i < nchaves;i++) a->info[i] = NULL;
     free(a->chave);
     free(a->filho);
     free(a->info);
@@ -276,52 +278,40 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
  *
  * */
 
- TABM *Insere(TABM *a, int k, int t, TREG *dado){
-	/* Casos da inserção:
-	* 1- Folha Completa
-	* 2- Folha incompleta
-	* 3- Sobrescrever informação
-	*/
-	if (!a){
-		a = Cria(t);
-		a->chave[0] = k;
-		a->folha = 1;
-		a->nchaves = 1;
-		a->info[0]->mat=dado->mat;
-		a->info[0]->cr=dado->cr;
-		a->info[0]->tranc=dado->tranc;
-		a->info[0]->ch_aprov=dado->ch_aprov;
-		a->info[0]->periodos=dado->periodos;
-		a->info[0]->cur=dado->cur;
-		strcpy(a->info[0]->nome,dado->nome);
-		return a;
-	}
-	TABM* aux = (TABM*) malloc (sizeof(TABM));
-	aux = Busca(a,k);
-	if (aux){
-		int i;
-		while ((k < aux->chave[i]) && (i <= aux->nchaves)) i++;
-		a->info[i]->mat = dado->mat;
-		a->info[i]->cr = dado->cr;
-		a->info[i]->tranc = dado->tranc;
-		a->info[i]->ch_aprov = dado->ch_aprov;
-		a->info[i]->periodos = dado->periodos;
-		a->info[i]->cur = dado->cur;
-		strcpy(a->info[0]->nome,dado->nome);
-		free(aux);
-		return a;
-	}
-	if (a->nchaves == (2*t)-1){
-		TABM* novo = (TABM*) malloc (sizeof(TABM));
-		novo->nchaves = 0;
-		novo->folha = 0;
-		novo->filho[0] = a;
-		novo = Divisao(novo,1,a,t);
-		novo = Insere_Nao_Completo(novo,k,t,dado);
-		return novo;
-	}
-	a = Insere_Nao_Completo(a,k,t,dado);
+TABM *Insere(TABM *a, int k, int t, TREG *dado){
+     /* Casos da inserção:
+     * 1- Folha Completa
+     * 2- Folha incompleta
+     * 3- Sobrescrever informação
+     */
+     if (!a){
+	a = Cria(t);
+	a->chave[0] = k;
+	a->folha = 1;
+	a->nchaves = 1;
+	a->info[0] = dado;
 	return a;
+     }
+     TABM* aux = (TABM*) malloc (sizeof(TABM));
+     aux = Busca(a,k);
+     if (aux){
+	int i;
+	while ((k < aux->chave[i]) && (i <= aux->nchaves)) i++;
+	a->info[i] = dado;
+	free(aux);
+	return a;
+      }
+      if (a->nchaves == (2*t)-1){
+	TABM* novo = (TABM*) malloc (sizeof(TABM));
+	novo->nchaves = 0;
+	novo->folha = 0;
+	novo->filho[0] = a;
+	novo = Divisao(novo,1,a,t);
+	novo = Insere_Nao_Completo(novo,k,t,dado);
+	return novo;
+      }
+      a = Insere_Nao_Completo(a,k,t,dado);
+      return a;
 }
 
 TABM * removeFormandos (TABM *a, int t);
