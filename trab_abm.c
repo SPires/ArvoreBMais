@@ -311,14 +311,7 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
  *
  * retorna: nova árvore*/
  TABM *Insere(TABM *a, int k, int t, TREG *dado){
-	if (!a){
-		a = Cria(t);
-		a->folha = 1;
-		a->chave[0] = k;
-		a->info[0] = dado;
-		a->nchaves = 1;
-		return a;
-	}
+	if (!a) return NULL;
 	TABM *aux = Busca(a,k);
 	if (aux){
 		int i=0;
