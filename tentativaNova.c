@@ -124,7 +124,7 @@ TABM* remover(TABM* arv, int ch, int t){
     if(arv->folha){ 
       printf("\nCASO 1\n");
       int j;
-      for(j=i; j<arv->nchaves-1;j++) {
+      for(j=i; j<arv->nchaves-1-1;j++) { // limitado pelo tamanho das chaves
         arv->chave[j] = arv->chave[j+1];
         arv->info[j]->mat = arv->info[j+1]->mat;
         arv->info[j]->cr = arv->info[j+1]->cr;
@@ -132,7 +132,7 @@ TABM* remover(TABM* arv, int ch, int t){
         arv->info[j]->ch_aprov = arv->info[j+1]->ch_aprov;
         arv->info[j]->periodos = arv->info[j+1]->periodos;
         arv->info[j]->cur = arv->info[j+1]->cur;
-	strcpy(arv->info[j+1]->nome,arv->info[j]->nome);
+	strcpy(arv->info[j]->nome,arv->info[j+1]->nome);
       }
       arv->nchaves--;
       return arv;      
