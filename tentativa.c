@@ -261,7 +261,7 @@ TABM *Divisao(TABM *x, int i, TABM* y, int t){
       y->filho[j+t] = NULL;
     }
   }
-  y->nchaves = y->nchaves - z->nchaves;
+  y->nchaves -= t-1;
   for(j=x->nchaves; j>=i; j--) x->filho[j+1]=x->filho[j];
   x->filho[i] = z;
   for(j=x->nchaves; j>=i; j--) x->chave[j] = x->chave[j-1];
@@ -519,8 +519,8 @@ TABM * novaArv (char *nome, int t){
    while (r == 7){
       a = Insere(a,aux->mat,t,aux);
       Imprime(a,0);
-      r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
       printf("%s", "Acabou uma...\n");
+      r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
    }
    free(aux);
    fclose(fp);
@@ -564,12 +564,24 @@ int gravarDados (TABM *a, char *saida){
  * t: fator de ramificação
  *
  * retorno: nova árvore */
-void imprimeinfo(TREG* t){
-    printf("%d ",t->mat);
-    printf("%f ",t->cr);
-    printf("%d ",t->tranc);
-    printf("%d %d %d ", t->ch_aprov,t->periodos,t->cur);
-    printf("%s ",t->nome);
+void imprimeinfo(TABM* a, int mat){
+    if (!a){
+	printf("Árvore não existe");
+    	exit(1);
+    }
+    TABM * aux = (TABM*) malloc (sizeof(TABM));
+    aux = Busca(a,mat);
+    if (!aux){
+	printf("Matrícula não existe");
+    	exit(1);
+    }
+    int i;
+    while ((i < aux->nchaves) && (mat > aux->chave[i])) i++;
+    printf("Matricula: %d ",aux->info[i]->mat);
+    printf("CR: %f ",aux->info[i]->cr);
+    printf("Trancamentos: %d ",aux->info[i]->tranc);
+    printf("CH total: %d \n Períodos cursados: %d \n Currículo: %d ", aux->info[i]->ch_aprov,aux->info[i]->periodos,aux->info[i]->cur);
+    printf("Nome: %s ",aux->info[i]->nome);
 }
   
 int main () {
@@ -590,9 +602,9 @@ int main () {
       printf("6 - mostrar arvore\n");
       printf("7 - exibir informações\n");
       printf("9 - escrever arvore no arquivo\n");
-	  scanf("%d", &op);
-	  fflush(stdin);
-    }while(op<0||(op!=9&&op>6));
+      scanf("%d", &op);
+      fflush(stdin);
+    }while(op<0||(op!=9&&op>7));
     switch(op)
     {
       case 0:
@@ -723,15 +735,9 @@ int main () {
       case 7:
 	{
 	  printf("Digite a matrícula desejada:\n");
-	  int mat, ind;
+	  int mat;
 	  scanf("%d",&mat);
-	  TABM * no = (TABM*) malloc (sizeof(TABM));
-	  no = Busca(arvore,mat);
-	  for (ind=0; ind < no->nchaves; ind++){
-		if (no->chave[ind] == mat)
-			imprimeinfo(no->info[ind]);
-	  }
-	  free(no);
+	  imprimeinfo(arvore,mat);
 	  break;
 	}
       case 9:
