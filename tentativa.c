@@ -545,10 +545,10 @@ int gravarDados (TABM *a, char *saida){
     }
   }
   a = primeiraFolha(a);
-  while (aux) {
+  while (a) {
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
-       fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
+       fprintf(fp, "%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
     }
     a = a->prox;
   }
