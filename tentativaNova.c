@@ -138,9 +138,10 @@ TABM* remover(TABM* arv, int ch, int t){
       return arv;      
     }     
   }
-  TABM *y = arv->filho[i], *z = NULL;
+  TABM *y = arv->filho[i], *z = NULL; //y é o pai do cara que eu vou descer
 	
-  if (y->nchaves == t-1){ //CASOS 3A e 3B
+  if (y->nchaves == t-1){ //CASOS 3A e 3B 
+	  // uma remoção pode deixar o y com menos chaves que o permitido
     if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){ //CASO 3A: Chave está no MEIO/ESQUERDA(y) = T-1, DIREITA(z) = T 
       printf("\nCASO 3A: i menor que nchaves\n");
       z = arv->filho[i+1];
@@ -151,6 +152,7 @@ TABM* remover(TABM* arv, int ch, int t){
       int j;
       for(j=0; j < z->nchaves-1; j++){ //ajusa as chaves de z, movendo seus elementos para a esquerda
         z->chave[j] = z->chave[j+1];
+	//substituir essa atribuição direta pela atribuição campo a campo
         z->info[j] = z->info[j+1];
       }
       y->filho[y->nchaves] = z->filho[0]; //enviar ponteiro menor de z para o novo elemento em y
