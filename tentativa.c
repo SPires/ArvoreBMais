@@ -543,6 +543,7 @@ int gravarDados (TABM *a, char *saida){
        aux = a->info[i];
        fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
     }
+	  fclose(fp);
 	  return 1;
   }
   
