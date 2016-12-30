@@ -146,14 +146,26 @@ TABM* remover(TABM* arv, int ch, int t){
       printf("\nCASO 3A: i menor que nchaves\n");
       z = arv->filho[i+1];
       y->chave[t-1] = z->chave[0];   //dar a y a chave 0 de z
-      y->info[t-1] = z->info[0];
+      y->info[t-1]->mat = z->info[0]->mat;
+      y->info[t-1]->cr = z->info[0]->cr;
+      y->info[t-1]->tranc = z->info[0]->tranc;
+      y->info[t-1]->ch_aprov = z->info[0]->ch_aprov;
+      y->info[t-1]->periodos = z->info[0]->periodos;
+      y->info[t-1]->cur = z->info[0]->cur;
+      strcpy(y->info[t-1]->nome,z->info[0]->nome);
       y->nchaves++;
       arv->chave[i] = z->chave[1]; //arv fica com o valor de chave igual ao primeiro elemento do filho da direita
       int j;
       for(j=0; j < z->nchaves-1; j++){ //ajusa as chaves de z, movendo seus elementos para a esquerda
         z->chave[j] = z->chave[j+1];
 	//substituir essa atribuição direta pela atribuição campo a campo
-        z->info[j] = z->info[j+1];
+        z->info[j]->mat = z->info[j+1]->mat;
+        z->info[j]->cr = z->info[j+1]->cr;
+        z->info[j]->tranc = z->info[j+1]->tranc;
+        z->info[j]->ch_aprov = z->info[j+1]->ch_aprov;
+        z->info[j]->periodos = z->info[j+1]->periodos;
+        z->info[j]->cur = z->info[j+1]->cur;
+        strcpy(z->info[j]->nome,z->info[j+1]->nome);
       }
       y->filho[y->nchaves] = z->filho[0]; //enviar ponteiro menor de z para o novo elemento em y
       for(j=0; j < z->nchaves; j++)       //ajustar filhos de z
@@ -168,11 +180,13 @@ TABM* remover(TABM* arv, int ch, int t){
       int j;
       for(j = y->nchaves; j>0; j--) {              //move as posições para abrir espaço pra nova chave
         y->chave[j] = y->chave[j-1];
+	//substituir atribuição direta pela atribuição campo a campo
         y->info[j] = y->info[j-1];
       }
       for(j = y->nchaves+1; j>0; j--)             //encaixar lugar dos filhos da nova chave
         y->filho[j] = y->filho[j-1];
       y->chave[0] = z->chave[z->nchaves-1];
+      //substituir atribuição direta pela atribuição campo a campo
       y->info[0] = z->info[z->nchaves-1];
       y->nchaves++;
       arv->chave[i-1] = y->chave[0]; 	          //recebe o valor da chave do filho da direita
@@ -188,10 +202,12 @@ TABM* remover(TABM* arv, int ch, int t){
         z = arv->filho[i+1];
         int j;
 	y->chave[t-1] = z->chave[0]; 
+	//substituir atribuição direta pela atribuição campo a campo
 	y->info[t-1] = z->info[0];
 	y->nchaves++;
         for(j=0; j < t-1; j++){
           y->chave[t+j] = z->chave[j+1];     //passar chave do filho da direita pro nó do filho da esquerda
+	  //substituir atribuição direta pela atribuição campo a campo
           y->info[t+j] = z->info[j+1];
 	  y->nchaves++;
         }
@@ -210,7 +226,7 @@ TABM* remover(TABM* arv, int ch, int t){
       }
 
       //acho que não entendi esse caso	    
-      if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ //filho da esquerda tem t-1 chaves??     
+      if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ //filho da esquerda tem t-1 chaves??   SIM é isso mesmo     
         printf("\nCASO 3B: i igual a nchaves\n");
         z = arv->filho[i-1];
         //if(i == arv->nchaves)
@@ -221,6 +237,7 @@ TABM* remover(TABM* arv, int ch, int t){
         int j;
         for(j=0; j < t-1; j++){
           z->chave[t-1+j] = y->chave[j];     //passar filho[i+1] para filho[i]
+	  //substituir atribuição direta pela atribuição campo a campo
           z->info[t-1+j] = y->info[j];
 	  z->nchaves++;
         }
