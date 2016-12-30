@@ -541,6 +541,7 @@ int gravarDados (TABM *a, char *saida){
   if (a->folha){
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
+	fprintf(stderr,"DEBUG: FOLHA %d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
        fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
     }
 	  fclose(fp);
@@ -551,6 +552,7 @@ int gravarDados (TABM *a, char *saida){
   while (a) {
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
+	fprintf(stderr,"DEBUG: NAOFOLHA %d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
        fprintf(fp, "%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
     }
     a = a->prox;
