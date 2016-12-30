@@ -16,6 +16,17 @@ typedef struct reg {
   char *nome;
 } TREG;
 
+inline void copyReg(TREG* destino, TREG* fonte)
+{
+	destino->mat=fonte->mat;
+	destino->cr=fonte->cr;
+	destino->tranc=fonte->tranc;
+	destino->ch_aprov=fonte->ch_aprov;
+	destino->periodos=fonte->periodos;
+	destino->cur=fonte->cur;
+	strcpy(destino->nome,fonte->nome);
+}
+
 /* Impressão da árvore
  * parametros : 
  * a: nó raiz da arvore
