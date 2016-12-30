@@ -137,13 +137,7 @@ TABM* remover(TABM* arv, int ch, int t){
       int j;
       for(j=i; j<arv->nchaves-1-1;j++) { // limitado pelo tamanho das chaves
         arv->chave[j] = arv->chave[j+1];
-        arv->info[j]->mat = arv->info[j+1]->mat;
-        arv->info[j]->cr = arv->info[j+1]->cr;
-        arv->info[j]->tranc = arv->info[j+1]->tranc;
-        arv->info[j]->ch_aprov = arv->info[j+1]->ch_aprov;
-        arv->info[j]->periodos = arv->info[j+1]->periodos;
-        arv->info[j]->cur = arv->info[j+1]->cur;
-	strcpy(arv->info[j]->nome,arv->info[j+1]->nome);
+	copyReg(arv->info[j],arv->info[j+1]);
       }
       arv->nchaves--;
       return arv;      
@@ -157,26 +151,14 @@ TABM* remover(TABM* arv, int ch, int t){
       printf("\nCASO 3A: i menor que nchaves\n");
       z = arv->filho[i+1];
       y->chave[t-1] = z->chave[0];   //dar a y a chave 0 de z
-      y->info[t-1]->mat = z->info[0]->mat;
-      y->info[t-1]->cr = z->info[0]->cr;
-      y->info[t-1]->tranc = z->info[0]->tranc;
-      y->info[t-1]->ch_aprov = z->info[0]->ch_aprov;
-      y->info[t-1]->periodos = z->info[0]->periodos;
-      y->info[t-1]->cur = z->info[0]->cur;
-      strcpy(y->info[t-1]->nome,z->info[0]->nome);
+      copyReg(y->info[t-1],z->info[0]);
       y->nchaves++;
       arv->chave[i] = z->chave[1]; //arv fica com o valor de chave igual ao primeiro elemento do filho da direita
       int j;
       for(j=0; j < z->nchaves-1; j++){ //ajusa as chaves de z, movendo seus elementos para a esquerda
         z->chave[j] = z->chave[j+1];
 	//substituir essa atribuição direta pela atribuição campo a campo
-        z->info[j]->mat = z->info[j+1]->mat;
-        z->info[j]->cr = z->info[j+1]->cr;
-        z->info[j]->tranc = z->info[j+1]->tranc;
-        z->info[j]->ch_aprov = z->info[j+1]->ch_aprov;
-        z->info[j]->periodos = z->info[j+1]->periodos;
-        z->info[j]->cur = z->info[j+1]->cur;
-        strcpy(z->info[j]->nome,z->info[j+1]->nome);
+	copyReg(z->info[j],z->info[j+1]);
       }
       y->filho[y->nchaves] = z->filho[0]; //enviar ponteiro menor de z para o novo elemento em y
       for(j=0; j < z->nchaves; j++)       //ajustar filhos de z
@@ -235,8 +217,7 @@ TABM* remover(TABM* arv, int ch, int t){
         arv = remover(arv, ch, t);
         return arv;
       }
-
-      //acho que não entendi esse caso	    
+    
       if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ //filho da esquerda tem t-1 chaves??   SIM é isso mesmo     
         printf("\nCASO 3B: i igual a nchaves\n");
         z = arv->filho[i-1];
@@ -249,7 +230,7 @@ TABM* remover(TABM* arv, int ch, int t){
         for(j=0; j < t-1; j++){
           z->chave[t-1+j] = y->chave[j];     //passar filho[i+1] para filho[i]
 	  //substituir atribuição direta pela atribuição campo a campo
-          z->info[t-1+j] = y->info[j];
+	  copyReg(z->info[t-1+j],y->info[j]);
 	  z->nchaves++;
         }
         if(!z->folha){
@@ -284,13 +265,7 @@ TABM *Divisao(TABM *x, int i, TABM* y, int t){
   if (y->folha){
 	for(j=0;j<t-1;j++){
 	  z->chave[j] = y->chave[j+t];
-	  z->info[j]->mat = y->info[j+t]->mat;
-          z->info[j]->cr = y->info[j+t]->cr;
-          z->info[j]->tranc = y->info[j+t]->tranc;
-          z->info[j]->ch_aprov = y->info[j+t]->ch_aprov;
-          z->info[j]->periodos = y->info[j+t]->periodos;
-          z->info[j]->cur = y->info[j+t]->cur;
-	  strcpy(z->info[j]->nome,y->info[j+t]->nome);
+	  copyReg(z->info[j],y->info[j+t]);
 	  y->info[j+t] = NULL;
     }
 	z->prox = y->prox;
@@ -325,24 +300,11 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   if(x->folha){
     while((i>=0) && (k<x->chave[i])){
       x->chave[i+1] = x->chave[i];
-	  x->info[i+1]->mat = x->info[i]->mat;
-          x->info[i+1]->cr = x->info[i]->cr;
-          x->info[i+1]->tranc = x->info[i]->tranc;
-          x->info[i+1]->ch_aprov = x->info[i]->ch_aprov;
-          x->info[i+1]->periodos = x->info[i]->periodos;
-          x->info[i+1]->cur = x->info[i]->cur;
-	  strcpy(x->info[i+1]->nome,x->info[i]->nome);
-	  x->info[i] = NULL;
+      copyReg(x->info[i+1],x->info[i]);
       i--;
     }
     x->chave[i+1] = k;
-    x->info[i+1]->mat = dado->mat;
-    x->info[i+1]->cr = dado->cr;
-    x->info[i+1]->tranc = dado->tranc;
-    x->info[i+1]->ch_aprov = dado->ch_aprov;
-    x->info[i+1]->periodos = dado->periodos;
-    x->info[i+1]->cur = dado->cur;
-    strcpy(x->info[j+1]->nome,dado->nome);
+    copyReg(x->info[i+1],dado);
     x->nchaves++;
     return x;
   }
@@ -370,13 +332,7 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
 	if (aux){
 		int i=0;
 		while ((i<aux->nchaves) && (k>aux->chave[i])) i++;
-                aux->info[i]->mat = dado->mat;
-        	aux->info[i]->cr = dado->cr;
-        	aux->info[i]->tranc = dado->tranc;
-        	aux->info[i]->ch_aprov = dado->ch_aprov;
-        	aux->info[i]->periodos = dado->periodos;
-        	aux->info[i]->cur = dado->cur;
-		strcpy(aux->info[i]->nome,dado->nome);
+                copyReg(aux->info[i],dado);
 		return a;
 	}
 	if(a->nchaves == (2*t)-1){
