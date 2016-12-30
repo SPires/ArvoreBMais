@@ -744,7 +744,9 @@ int main () {
 		{
         	char nomeArquivo[501];
         	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+		fflush(stdin);
         	scanf("%500[^\n]",nomeArquivo);
+		fprintf(stderr,"DEBUG: o nome do arquivo e : %s\n", nomeArquivo);
         	fflush(stdin);
         	gravarDados(arvore,nomeArquivo);
 			break;
