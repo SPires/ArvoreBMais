@@ -283,12 +283,26 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
   if(x->folha){
     while((i>=0) && (k<x->chave[i])){
       x->chave[i+1] = x->chave[i];
-	  x->info[i+1] = x->info[i];
-	  x->info[i] = NULL;
+      x->info[i+1] = x->info[i];
+      printf("%d\n",x->info[i+1]->mat);
+   	printf("%f\n",x->info[i+1]->cr);
+   	printf("%d\n",x->info[i+1]->tranc);
+   	printf("%d\n",x->info[i+1]->ch_aprov);
+   	printf("%d\n",x->info[i+1]->periodos);
+   	printf("%d\n",x->info[i+1]->cur);
+   	printf("%s\n",x->info[i+1]->nome);
+      x->info[i] = NULL;
       i--;
     }
     x->chave[i+1] = k;
     x->info[i+1] = dado;
+	printf("%d\n",x->info[i+1]->mat);
+   	printf("%f\n",x->info[i+1]->cr);
+   	printf("%d\n",x->info[i+1]->tranc);
+   	printf("%d\n",x->info[i+1]->ch_aprov);
+   	printf("%d\n",x->info[i+1]->periodos);
+   	printf("%d\n",x->info[i+1]->cur);
+   	printf("%s\n",x->info[i+1]->nome);
     x->nchaves++;
     return x;
   }
@@ -491,17 +505,24 @@ int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* perio
 	aux=strtok(linha," ");
 	if(aux==NULL) return 0;
 	*mat=atoi(aux);
+	printf("%d\n",*mat);
 	aux=strtok(NULL," ");
 	*cr=atof(aux);
+	printf("%f\n",*cr);
 	aux=strtok(NULL," ");
 	*tranc=atoi(aux);
+	printf("%d\n",*tranc);
 	aux=strtok(NULL," ");
 	*ch_aprov=atoi(aux);
+	printf("%d\n",*ch_aprov);
 	aux=strtok(NULL," ");
 	*periodos=atoi(aux);
+	printf("%d\n",*periodos);
 	aux=strtok(NULL, " ");
 	*cur=atoi(aux);
+	printf("%d\n",*cur);
 	*nome=strtok(NULL,"\n");
+	printf("%s\n",*nome);
 	return 7;
 }
 
@@ -516,6 +537,13 @@ TABM * novaArv (char *nome, int t){
    TABM *a = Cria(t);
    TREG *aux = (TREG *) malloc (sizeof(TREG));
    int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
+   printf("%d\n",aux->mat);
+   printf("%f\n",aux->cr);
+   printf("%d\n",aux->tranc);
+   printf("%d\n",aux->ch_aprov);
+   printf("%d\n",aux->periodos);
+   printf("%d\n",aux->cur);
+   printf("%s\n",aux->nome);
    while (r == 7){
       a = Insere(a,aux->mat,t,aux);
       Imprime(a,0);
@@ -540,12 +568,18 @@ int gravarDados (TABM *a, char *saida){
   FILE *fp = fopen(saida,"wt+");
   if (!fp) exit(1);
   if (!a->folha) a = primeiraFolha(a);
+  TREG * aux = (TREG*) malloc (sizeof(TREG));
   int i;
-  TREG *aux = (TREG *) malloc (sizeof(TREG));
   while (a) {
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
-       fprintf(fp, "%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
+       fprintf(fp, "%d ",aux->mat);
+       fprintf(fp, "%f ",aux->cr);
+       fprintf(fp, "%d ",aux->tranc);
+       fprintf(fp, "%d ",aux->ch_aprov);
+       fprintf(fp, "%d ",aux->periodos);
+       fprintf(fp, "%d ",aux->cur);
+       fprintf(fp, "%s\n",aux->nome);
     }
     a = a->prox;
   }
@@ -553,6 +587,7 @@ int gravarDados (TABM *a, char *saida){
   free(aux);
   Libera(a);
   a=NULL;
+  printf("Árvore enviada para o arquivo e liberada.\n");
   return 1;
 }
 
@@ -648,14 +683,14 @@ int main () {
         	printf("Digite o numero do curriculo : ");
        		scanf("%d", &cur);
         	printf("Digite o nome do candidato (tamanho maximo de 100 caracteres, os excedentes serao ignorados : ");
-        	scanf("%100[^\n]", nomeCandidato);
+		scanf(" %100[\n]",nomeCandidato);
         	novo->mat=mat;
         	novo->cr=cr;
         	novo->tranc=tranc;
         	novo->ch_aprov=ch_aprov;
         	novo->periodos=periodos;
         	novo->cur=cur;
-        	novo->nome=nomeCandidato;
+        	strcpy(novo->nome,nomeCandidato);
         	arvore=Insere(arvore,mat,t,novo);
         	Imprime(arvore,0);
         	break;
@@ -740,11 +775,12 @@ int main () {
 	}
       case 9:
 		{
-        	char nomeArquivo[501];
-        	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
-        	scanf("%500[^\n]",nomeArquivo);
-        	fflush(stdin);
-        	gravarDados(arvore,nomeArquivo);
+        	//char nomeArquivo[501];
+        	//printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+        	//scanf("%500[^\n]",nomeArquivo);
+        	//fflush(stdin);
+		char *saida = "saida.txt";
+        	gravarDados(arvore,saida);
 			break;
 		}
     }
