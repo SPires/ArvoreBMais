@@ -533,26 +533,18 @@ TABM * novaArv (char *nome, int t){
  *
  * retorno: nova árvore */
 int gravarDados (TABM *a, char *saida){
-  if (!a) return 0;
+  if (!a) {
+     printf("%s","Árvore não existe");
+     return 0;
+  }
   FILE *fp = fopen(saida,"wt+");
   if (!fp) exit(1);
+  if (!a->folha) a = primeiraFolha(a);
   int i;
   TREG *aux = (TREG *) malloc (sizeof(TREG));
-  if (a->folha){
-    for (i=0;i<a->nchaves;i++){
-       aux = a->info[i];
-	fprintf(stderr,"DEBUG: FOLHA %d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
-       fprintf(fp, "%d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
-    }
-	  fclose(fp);
-	  return 1;
-  }
-  
-  a = primeiraFolha(a);
   while (a) {
     for (i=0;i<a->nchaves;i++){
        aux = a->info[i];
-	fprintf(stderr,"DEBUG: NAOFOLHA %d %f %d %d %d %d %s\n",a->info[i]->mat,a->info[i]->cr,a->info[i]->tranc,a->info[i]->ch_aprov,a->info[i]->periodos,a->info[i]->cur,a->info[i]->nome);
        fprintf(fp, "%d %f %d %d %d %d %s\n",aux->mat,aux->cr,aux->tranc,aux->ch_aprov,aux->periodos,aux->cur,aux->nome);
     }
     a = a->prox;
@@ -563,6 +555,7 @@ int gravarDados (TABM *a, char *saida){
   a=NULL;
   return 1;
 }
+
 
 /* Exibir dados de um aluno específico
  * parametros : 
@@ -749,9 +742,7 @@ int main () {
 		{
         	char nomeArquivo[501];
         	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
-		fflush(stdin);
         	scanf("%500[^\n]",nomeArquivo);
-		fprintf(stderr,"DEBUG: o nome do arquivo e : %s\n", nomeArquivo);
         	fflush(stdin);
         	gravarDados(arvore,nomeArquivo);
 			break;
