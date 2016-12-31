@@ -683,7 +683,7 @@ int main () {
         	printf("Digite o numero do curriculo : ");
        		scanf("%d", &cur);
         	printf("Digite o nome do candidato (tamanho maximo de 100 caracteres, os excedentes serao ignorados : ");
-		scanf(" %100[\n]",nomeCandidato);
+		scanf(" %100[^\n]",nomeCandidato);
         	novo->mat=mat;
         	novo->cr=cr;
         	novo->tranc=tranc;
