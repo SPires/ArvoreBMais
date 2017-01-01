@@ -748,7 +748,7 @@ void imprimeinfo(TABM* a, int mat){
 	printf("\n---------------\n\n");
     	return;
     }
-    int i;
+    int i=0;
     while ((i < aux->nchaves) && (mat > aux->chave[i])) i++;
     printf("------------------------\n\n");
     printf("Matricula: %d\n",aux->info[i]->mat);
