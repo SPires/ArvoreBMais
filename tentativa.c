@@ -83,13 +83,16 @@ void Libera(TABM *a){
  *
  * retorno: o nó em que foi encontrada a chave ou NULL, caso nao encontre  */
 TABM *Busca(TABM* x, int ch){
-  TABM *resp = NULL;
-  if(!x) return resp;
-  int i = 0;
-  while(i < x->nchaves && ch > x->chave[i]) i++;
-  if(i < x->nchaves && ch == x->chave[i]) return x;
-  if(x->folha) return resp;
-  return Busca(x->filho[i], ch);
+	TABM *resp = NULL;
+	if(!x) return resp;
+	int i=0;
+	if (x->folha) {
+		while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
+		if (ch == x->chave[i]) return x;
+	}
+	while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
+	if (ch == x->chave[i]) return Busca(x->filho[i+1],ch);
+	return Busca(x->filho[i],ch);
 }
 
     
@@ -548,7 +551,7 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   TABM *aux = (TABM*) malloc (sizeof(TABM));
   aux = Busca(a,mat);
   if (!aux) return NULL;
-  int i;
+  int i=0;
   while (mat > aux->chave[i]) i++;
   aux->info[i]->cr = novocr;
   return a;
@@ -557,57 +560,33 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
 TABM *alteraCH (TABM *a, int t, int mat, int novaCH){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
-  aux = primeiraFolha(a);
+  aux = Busca(a,mat);
   if (!aux) return NULL;
-  int i;
-  while(aux){
-	while (mat > aux->chave[i]) i++;
-	if (mat == aux->chave[i]) break;
-	if (i == (aux->nchaves-1)) aux = aux->prox;
-  }
-  TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = criaReg(aux->info[i]->mat, aux->info[i]->cr,aux->info[i]->tranc,novaCH,aux->info[i]->periodos,aux->info[i]->cur,aux->info[i]->nome);
-  a = Insere(a,mat,t,aluno);
-  free(aluno);
-  free(aux);
+  int i=0;
+  while (mat > aux->chave[i]) i++;
+  aux->info[i]->ch_aprov = novaCH;
   return a;
 }
 
 TABM * alteraTranc (TABM *a, int t, int mat, int ntranc){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
-  aux = primeiraFolha(a);
+  aux = Busca(a,mat);
   if (!aux) return NULL;
-  int i;
-  while(aux){
-	while (mat > aux->chave[i]) i++;
-	if (mat == aux->chave[i]) break;
-	if (i == (aux->nchaves-1)) aux = aux->prox;
-  }
-  TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = criaReg(aux->info[i]->mat, aux->info[i]->cr,ntranc,aux->info[i]->ch_aprov,aux->info[i]->periodos,aux->info[i]->cur,aux->info[i]->nome);
-  a = Insere(a,mat,t,aluno);
-  free(aluno);
-  free(aux);
+  int i=0;
+  while (mat > aux->chave[i]) i++;
+  aux->info[i]->tranc = ntranc;
   return a;
 }
 
 TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
-  aux = primeiraFolha(a);
+  aux = Busca(a,mat);
   if (!aux) return NULL;
-  int i;
-  while(aux){
-	while (mat > aux->chave[i]) i++;
-	if (mat == aux->chave[i]) break;
-	if (i == (aux->nchaves-1)) aux = aux->prox;
-  }
-  TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = criaReg(aux->info[i]->mat, aux->info[i]->cr,aux->info[i]->tranc,aux->info[i]->ch_aprov,nperi,aux->info[i]->cur,aux->info[i]->nome);
-  a = Insere(a,mat,t,aluno);
-  free(aluno);
-  free(aux);
+  int i=0;
+  while (mat > aux->chave[i]) i++;
+  aux->info[i]->periodos = nperi;
   return a;
 }
 
@@ -671,8 +650,8 @@ TABM * novaArv (char *nome, int t){
 		ctrl = fscanf(fp,"%d %f %d %d %d %d ", &mat, &cr, &tranc, &ch_aprov, &periodos, &cur);
 		if (ctrl != 6) break;
 		i = 0;
-		while(i<100){//tamanho máximo do nome
-			c = fgetc(fp);//leitura char a char do nome
+		while(i<100){
+			c = fgetc(fp);
 			if(c == '\n' || c == EOF)break;
 			nome[i] = c;
 			i++;
