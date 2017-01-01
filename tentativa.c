@@ -13,8 +13,11 @@ typedef struct reg {
   float cr;
   int tranc;
   int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
-  char *nome;
+  char nome[101];
 } TREG;
+
+TABM* primeiraFolha(TABM* a);
+TREG* criaReg(int mat, float cr, int tranc, int ch_aprov, int periodos, int cur, char *nome);
 
 /* Impressão da árvore
  * parametros : 
@@ -82,16 +85,13 @@ void Libera(TABM *a){
 TABM *Busca(TABM* x, int ch){
   TABM *resp = NULL;
   if(!x) return resp;
-  int i=0;
-  if (x->folha==1){
-  	for(i=0;i<x->nchaves;i++)
-		if (x->chave[i]==ch)
-			resp = x;
-	return resp;
-  }
-  while(ch > x->chave[i] && i<x->nchaves) i++;
-  return Busca(x->filho[i],ch);
+  int i = 0;
+  while(i < x->nchaves && ch > x->chave[i]) i++;
+  if(i < x->nchaves && ch == x->chave[i]) return x;
+  if(x->folha) return resp;
+  return Busca(x->filho[i], ch);
 }
+
     
 TABM* remover(TABM* arv, int ch, int t);
 
@@ -103,7 +103,10 @@ TABM* remover(TABM* arv, int ch, int t);
  *
  * retorno: nova árvore */
 TABM* retira(TABM* arv, int k, int t){
-  if(!arv || !Busca(arv, k)) return arv;
+  if(!arv || !Busca(arv, k)){
+	printf("Árvore não carregada ou matrícula não encontrada.\n");	
+	return arv;
+  }
   return remover(arv, k, t);
 }    
 
@@ -115,121 +118,246 @@ TABM* retira(TABM* arv, int k, int t){
  *
  * retorno: nova árvore */ 
 TABM* remover(TABM* arv, int ch, int t){
-  if(!arv) return arv;
-  int i;
-  printf("Removendo %d...\n", ch);
-  for(i = 0; i<arv->nchaves && arv->chave[i] < ch; i++);
-	
-  if(i < arv->nchaves && ch == arv->chave[i]){ //   CASO 1
-    if(arv->folha){ 
-      printf("\nCASO 1\n");
-      int j;
-      for(j=i; j<arv->nchaves-1;j++) {
-        arv->chave[j] = arv->chave[j+1];
-        arv->info[j] = arv->info[j+1];
-      }
-      arv->nchaves--;
-      return arv;      
-    }     
-  }
-  TABM *y = arv->filho[i], *z = NULL;
-	
-  if (y->nchaves == t-1){ //CASOS 3A e 3B
-    if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){ //CASO 3A: Chave está no MEIO/ESQUERDA(y) = T-1, DIREITA(z) = T 
-      printf("\nCASO 3A: i menor que nchaves\n");
-      z = arv->filho[i+1];
-      y->chave[t-1] = z->chave[0];   //dar a y a chave 0 de z
-      y->info[t-1] = z->info[0];
-      y->nchaves++;
-      arv->chave[i] = z->chave[1]; //arv fica com o valor de chave igual ao primeiro elemento do filho da direita
-      int j;
-      for(j=0; j < z->nchaves-1; j++){ //ajusa as chaves de z, movendo seus elementos para a esquerda
-        z->chave[j] = z->chave[j+1];
-        z->info[j] = z->info[j+1];
-      }
-      y->filho[y->nchaves] = z->filho[0]; //enviar ponteiro menor de z para o novo elemento em y
-      for(j=0; j < z->nchaves; j++)       //ajustar filhos de z
-        z->filho[j] = z->filho[j+1];
-      z->nchaves--;
-      arv->filho[i] = remover(arv->filho[i], ch, t);
-      return arv;
-   }
-    if((i > 0) && (!z) && (arv->filho[i-1]->nchaves >=t)){ //CASO 3A: ESQUERDA(z) = T, DIREITA/MEIO(y) = T-1
-      printf("\nCASO 3A: i igual a nchaves\n");
-      z = arv->filho[i-1];
-      int j;
-      for(j = y->nchaves; j>0; j--) {              //move as posições para abrir espaço pra nova chave
-        y->chave[j] = y->chave[j-1];
-        y->info[j] = y->info[j-1];
-      }
-      for(j = y->nchaves+1; j>0; j--)             //encaixar lugar dos filhos da nova chave
-        y->filho[j] = y->filho[j-1];
-      y->chave[0] = z->chave[z->nchaves-1];
-      y->info[0] = z->info[z->nchaves-1];
-      y->nchaves++;
-      arv->chave[i-1] = y->chave[0]; 	          //recebe o valor da chave do filho da direita
-      y->filho[0] = z->filho[z->nchaves];         //enviar ponteiro do último elemento de z para o novo elemento em y
-      z->nchaves--;
-      arv->filho[i] = remover(y, ch, t);
-      return arv;
-    }
-    
-    if(!z){ //CASO 3B
-      if(i < arv->nchaves && arv->filho[i+1]->nchaves == t-1){  //filho da direita tem t-1 chaves
-        printf("\nCASO 3B: i menor que nchaves\n");
-        z = arv->filho[i+1];
-        int j;
-	y->chave[t-1] = z->chave[0]; 
-	y->info[t-1] = z->info[0];
-	y->nchaves++;
-        for(j=0; j < t-1; j++){
-          y->chave[t+j] = z->chave[j+1];     //passar chave do filho da direita pro nó do filho da esquerda
-          y->info[t+j] = z->info[j+1];
-	  y->nchaves++;
-        }
-        if(!y->folha){
-          for(j=0; j<t; j++){
-            y->filho[t-1+j] = z->filho[j];    //passa a referência dos filhos
-          }
-        }
-        for(j=i; j < arv->nchaves-1; j++){    //hmmmm...... 
-          arv->chave[j] = arv->chave[j+1];
-          arv->filho[j+1] = arv->filho[j+2];
-        }
-        arv->nchaves--;
-        arv = remover(arv, ch, t);
-        return arv;
-      }
+	if (arv->folha){
+		printf("Removendo %d pelo Caso 1.\n",ch);		
+		int i=0;
+		while ((i < arv->nchaves)&&(ch > arv->chave[i])) i++;
+		if (i == arv->nchaves-1){
+			arv->info[i] = NULL;
+			arv->nchaves--;
+			return arv;
+		}
+		int j;
+		for (j=i; j < arv->nchaves; j++){
+			arv->chave[j] = arv->chave[j+1];
+			arv->info[j] = arv->info[j+1];
+		}
+		arv->nchaves--;
+	}
+	int i=0;
+	while ((i < arv->nchaves)&&(ch > arv->chave[i])) i++;
+	if (i==0){	
+		if (ch < arv->chave[0]){
+			if (arv->filho[0]->nchaves >= t){
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[0],ch,t);
+			}
+			if (arv->filho[1]->nchaves >= t){
+				printf("Aplicação do caso 3A.\n");
+				arv->filho[0]->nchaves++;
+				arv->filho[0]->chave[arv->nchaves-1] = arv->filho[1]->chave[0];
+				if (arv->filho[0]->folha){
+					arv->filho[0]->info[arv->nchaves-1] = arv->filho[1]->info[0];
+				}
+				arv->chave[0] = arv->filho[1]->chave[1];
+				int j;				
+				for (j=i; j < arv->filho[1]->nchaves; j++){
+					arv->filho[1]->chave[j] = arv->filho[1]->chave[j+1];
+					if (arv->filho[1]->folha){
+						arv->filho[1]->info[j] = arv->filho[1]->info[j+1];
+					}
+				}
+				arv->filho[1]->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[0],ch,t);
+			}
+			if (arv->filho[1]->nchaves == (t-1)){
+				printf("Aplicação do caso 3B.\n");
+				int j;
+				arv->filho[0]->nchaves = arv->filho[0]->nchaves + arv->filho[1]->nchaves;
+				for (j=0; j < arv->filho[1]->nchaves; j++){
+					arv->filho[0]->chave[arv->filho[0]->nchaves + j] = arv->filho[1]->chave[j];
+					if (arv->filho[0]->folha){
+						arv->filho[0]->info[arv->filho[0]->nchaves + j] = arv->filho[1]->info[j];
+					}
+				}
+				arv->filho[0]->prox = arv->filho[1]->prox;
+				Libera(arv->filho[1]);
+				arv->nchaves--;
+				for (j=0; j < arv->nchaves; j++){
+					arv->chave[j] = arv->chave[j+1];
+					arv->filho[j+1] = arv->filho[j+2]; 
+				}
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[0],ch,t);
+			}
 
-      //acho que não entendi esse caso	    
-      if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ //filho da esquerda tem t-1 chaves??     
-        printf("\nCASO 3B: i igual a nchaves\n");
-        z = arv->filho[i-1];
-        //if(i == arv->nchaves)
-        //  z->chave[t-1] = arv->chave[i-1]; //pegar chave[i] e poe ao final de filho[i-1]
-        //else
-        //  z->chave[t-1] = arv->chave[i];   //pegar chave [i] e poe ao final de filho[i-1]
-        //z->nchaves++;
-        int j;
-        for(j=0; j < t-1; j++){
-          z->chave[t-1+j] = y->chave[j];     //passar filho[i+1] para filho[i]
-          z->info[t-1+j] = y->info[j];
-	  z->nchaves++;
-        }
-        if(!z->folha){
-          for(j=0; j<t; j++){
-            z->filho[t-1+j] = y->filho[j];
-          }
-        }
-        arv->nchaves--;
-        arv->filho[i-1] = z;
-        arv = remover(arv, ch, t);
-        return arv;
-      }
-    }
-  }  
-  arv->filho[i] = remover(arv->filho[i], ch, t);
-  return arv;
+		}
+	}
+	if (i == arv->nchaves-1){
+		if (ch > arv->chave[i]){
+			if (arv->filho[i+1]->nchaves >= t){
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i],ch,t);
+			}
+			if (arv->filho[i]->nchaves >= t){
+				printf("Aplicação do caso 3A.\n");
+				arv->filho[i+1]++;
+				int ult = arv->filho[i+1]->nchaves, j;
+				for (j=ult; j >= 1; j--){
+					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
+					if (arv->filho[i+1]->folha){
+						arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
+					}
+				}
+				arv->filho[i+1]->chave[0] = arv->filho[i]->chave[arv->filho[i]->nchaves-1];
+				if (arv->filho[i+1]->folha){
+					arv->filho[i+1]->info[0] = arv->filho[i]->info[arv->filho[i]->nchaves-1];
+				}
+				arv->filho[i]->nchaves--;
+				arv->chave[arv->nchaves-1] = arv->filho[i+1]->chave[0];
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i+1],ch,t);
+				
+			}
+			if (arv->filho[i]->nchaves == (t-1)){
+				printf("Aplicação do caso 3B.\n");
+				int j, partida = arv->filho[i]->nchaves;
+				arv->filho[i]->nchaves = arv->filho[i]->nchaves + arv->filho[i+1]->nchaves;
+				for (j=0; j < arv->filho[i+1]->nchaves; j++){
+					arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
+					if (arv->filho[i]->folha){
+						arv->filho[i]->info[partida+j] = arv->filho[i+1]->info[j];
+					}
+				}
+				arv->nchaves--;
+				arv->filho[i]->prox = arv->filho[i+1]->prox;
+				Libera(arv->filho[i+1]);
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i],ch,t);
+			}
+		}
+	}
+	if ((i >= 1)&&(i < arv->nchaves-1)){
+		if (ch < arv->chave[i]){
+			if (arv->filho[i]->nchaves >= t){
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i],ch,t);
+			}
+			if (arv->filho[i+1]->nchaves >=t){ //Pela Direita
+				printf("Aplicação do caso 3A.\n");
+				arv->filho[i]->nchaves++;
+				arv->filho[i]->chave[arv->nchaves-1] = arv->filho[i+1]->chave[0];
+				if (arv->filho[i]->folha){
+					arv->filho[i]->info[arv->nchaves-1] = arv->filho[i+1]->info[0];
+				}
+				arv->chave[i] = arv->filho[i+1]->chave[1];
+				int j;				
+				for (j=i; j < arv->filho[i+1]->nchaves; j++){
+					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j+1];
+					if (arv->filho[i+1]->folha){
+						arv->filho[i+1]->info[j] = arv->filho[i+1]->info[j+1];
+					}
+				}
+				arv->filho[i+1]->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i],ch,t);
+			}
+			if (arv->filho[i-1]->nchaves >=t){ //Pela Esquerda
+				printf("Aplicação do caso 3A.\n");
+				arv->filho[i]->nchaves++;
+				int j;
+				for (j=arv->filho[i]->nchaves-1; j >= 1; j--){
+					arv->filho[i]->chave[j] = arv->filho[i]->chave[j-1];
+					if (arv->filho[i]->folha){
+						arv->filho[i]->info[j] = arv->filho[i]->info[j-1];
+					}
+				}
+				arv->filho[i]->chave[0] = arv->filho[i-1]->chave[arv->filho[i-1]->nchaves-1];
+				if (arv->filho[i]->folha){
+					arv->filho[i]->info[0] = arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1];
+				}
+				arv->chave[i-1] = arv->filho[i]->chave[0];
+				arv->filho[i-1]->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i],ch,t);
+			}
+			if (arv->filho[i+1]->nchaves == (t-1)){
+				printf("Aplicação do caso 3B.\n");
+				int partida = arv->filho[i]->nchaves, j;
+				for (j=0; j < arv->filho[i+1]->nchaves; j++){
+					arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
+					if (arv->filho[i]->folha){
+						arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
+					}
+				}
+				arv->filho[i]->nchaves = arv->filho[i]->nchaves + arv->filho[i+1]->nchaves;
+				arv->filho[i]->prox = arv->filho[i+1]->prox;
+				Libera(arv->filho[i+1]);
+				for (j=i; j < arv->nchaves; j++){
+					arv->chave[i] = arv->chave[i+1];
+					arv->filho[i+1] = arv->filho[i+2];
+				}
+				arv->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i],ch,t);
+			}
+		}
+		if (ch == arv->chave[i]){
+			if (arv->filho[i+1]->nchaves >= t){
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i+1],ch,t);
+			}
+			if (arv->filho[i+2]->nchaves >= t){ //Pela Direita
+				printf("Aplicação do caso 3A.\n");
+				arv->filho[i+1]->nchaves++;
+				arv->filho[i+1]->chave[arv->nchaves-1] = arv->filho[i+2]->chave[0];
+				if (arv->filho[i+1]->folha){
+					arv->filho[i+1]->info[arv->nchaves-1] = arv->filho[i+2]->info[0];
+				}
+				arv->chave[i+1] = arv->filho[i+2]->chave[1];
+				int j;				
+				for (j=i; j < arv->filho[i+2]->nchaves; j++){
+					arv->filho[i+2]->chave[j] = arv->filho[i+2]->chave[j+1];
+					if (arv->filho[i+2]->folha){
+						arv->filho[i+2]->info[j] = arv->filho[i+2]->info[j+1];
+					}
+				}
+				arv->filho[i+2]->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i+1],ch,t);
+			}
+			if (arv->filho[i]->nchaves >= t){ //Pela Esquerda
+				printf("Aplicação do caso 3A.\n");
+				arv->filho[i+1]->nchaves++;
+				int j;
+				for (j=arv->filho[i+1]->nchaves-1; j >= 1; j--){
+					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
+					if (arv->filho[i+1]->folha){
+						arv->filho[i+1]->info[j] = arv->filho[i+1]->info[j-1];
+					}
+				}
+				arv->filho[i]->chave[0] = arv->filho[i]->chave[arv->filho[i]->nchaves-1];
+				if (arv->filho[i]->folha){
+					arv->filho[i+1]->info[0] = arv->filho[i]->info[arv->filho[i]->nchaves-1];
+				}
+				arv->chave[i] = arv->filho[i+1]->chave[0];
+				arv->filho[i]->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i+1],ch,t);
+			}
+			if (arv->filho[i+2]->nchaves == (t-1)){
+				printf("Aplicação do caso 3B.\n");
+				int partida = arv->filho[i+1]->nchaves, j;
+				for (j=0; j < arv->filho[i+2]->nchaves; j++){
+					arv->filho[i+1]->chave[partida+j] = arv->filho[i+2]->chave[j];
+					if (arv->filho[i+1]->folha){
+						arv->filho[i+1]->chave[partida+j] = arv->filho[i+2]->chave[j];
+					}
+				}
+				arv->filho[i+1]->nchaves = arv->filho[i+1]->nchaves + arv->filho[i+2]->nchaves;
+				arv->filho[i+1]->prox = arv->filho[i+2]->prox;
+				Libera(arv->filho[i+2]);
+				for (j=i; j < arv->nchaves; j++){
+					arv->chave[i+1] = arv->chave[i+2];
+					arv->filho[i+2] = arv->filho[i+3];
+				}
+				arv->nchaves--;
+				printf("Uma chamada recursiva.\n");
+				return remover(arv->filho[i+1],ch,t);
+			}
+		}
+	}
 }
 
 /* Aplicar divisão em nós cheios
@@ -284,25 +412,11 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
     while((i>=0) && (k<x->chave[i])){
       x->chave[i+1] = x->chave[i];
       x->info[i+1] = x->info[i];
-      printf("%d\n",x->info[i+1]->mat);
-   	printf("%f\n",x->info[i+1]->cr);
-   	printf("%d\n",x->info[i+1]->tranc);
-   	printf("%d\n",x->info[i+1]->ch_aprov);
-   	printf("%d\n",x->info[i+1]->periodos);
-   	printf("%d\n",x->info[i+1]->cur);
-   	printf("%s\n",x->info[i+1]->nome);
       x->info[i] = NULL;
       i--;
     }
     x->chave[i+1] = k;
     x->info[i+1] = dado;
-	printf("%d\n",x->info[i+1]->mat);
-   	printf("%f\n",x->info[i+1]->cr);
-   	printf("%d\n",x->info[i+1]->tranc);
-   	printf("%d\n",x->info[i+1]->ch_aprov);
-   	printf("%d\n",x->info[i+1]->periodos);
-   	printf("%d\n",x->info[i+1]->cur);
-   	printf("%s\n",x->info[i+1]->nome);
     x->nchaves++;
     return x;
   }
@@ -343,7 +457,6 @@ TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
 		return S;
 	}
 	a = Insere_Nao_Completo(a,k,t,dado);
-	printf("Insere não completo terminado\n");
 	return a;
 }
 
@@ -362,7 +475,6 @@ TABM * otimizaArvore(TABM *a, int t){
     return a;
    }
 
-TABM* primeiraFolha(TABM* a);
 
 TABM * removeFormandos(TABM * a, int t){
     if(!a) return NULL;
@@ -438,25 +550,23 @@ TABM * alteraCR (TABM *a, int t, int mat, float novocr){
   if (!aux) return NULL;
   int i;
   while (mat > aux->chave[i]) i++;
-  TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = aux->info[i];
-  aluno->cr = novocr;
-  a = Insere(a,mat,t,aluno);
-  free(aluno);
-  free(aux);
+  aux->info[i]->cr = novocr;
   return a;
 }
 
 TABM *alteraCH (TABM *a, int t, int mat, int novaCH){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
-  aux = Busca(a,mat);
+  aux = primeiraFolha(a);
   if (!aux) return NULL;
   int i;
-  while (mat > aux->chave[i]) i++;
+  while(aux){
+	while (mat > aux->chave[i]) i++;
+	if (mat == aux->chave[i]) break;
+	if (i == (aux->nchaves-1)) aux = aux->prox;
+  }
   TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = aux->info[i];
-  aluno->ch_aprov = novaCH;
+  aluno = criaReg(aux->info[i]->mat, aux->info[i]->cr,aux->info[i]->tranc,novaCH,aux->info[i]->periodos,aux->info[i]->cur,aux->info[i]->nome);
   a = Insere(a,mat,t,aluno);
   free(aluno);
   free(aux);
@@ -466,13 +576,16 @@ TABM *alteraCH (TABM *a, int t, int mat, int novaCH){
 TABM * alteraTranc (TABM *a, int t, int mat, int ntranc){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
-  aux = Busca(a,mat);
+  aux = primeiraFolha(a);
   if (!aux) return NULL;
   int i;
-  while (mat > aux->chave[i]) i++;
+  while(aux){
+	while (mat > aux->chave[i]) i++;
+	if (mat == aux->chave[i]) break;
+	if (i == (aux->nchaves-1)) aux = aux->prox;
+  }
   TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = aux->info[i];
-  aluno->tranc = ntranc;
+  aluno = criaReg(aux->info[i]->mat, aux->info[i]->cr,ntranc,aux->info[i]->ch_aprov,aux->info[i]->periodos,aux->info[i]->cur,aux->info[i]->nome);
   a = Insere(a,mat,t,aluno);
   free(aluno);
   free(aux);
@@ -482,13 +595,16 @@ TABM * alteraTranc (TABM *a, int t, int mat, int ntranc){
 TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
   if (!a) return NULL;
   TABM *aux = (TABM*) malloc (sizeof(TABM));
-  aux = Busca(a,mat);
+  aux = primeiraFolha(a);
   if (!aux) return NULL;
   int i;
-  while (mat > aux->chave[i]) i++;
+  while(aux){
+	while (mat > aux->chave[i]) i++;
+	if (mat == aux->chave[i]) break;
+	if (i == (aux->nchaves-1)) aux = aux->prox;
+  }
   TREG *aluno = (TREG *) malloc (sizeof(TREG));
-  aluno = aux->info[i];
-  aluno->periodos = nperi;
+  aluno = criaReg(aux->info[i]->mat, aux->info[i]->cr,aux->info[i]->tranc,aux->info[i]->ch_aprov,nperi,aux->info[i]->cur,aux->info[i]->nome);
   a = Insere(a,mat,t,aluno);
   free(aluno);
   free(aux);
@@ -496,8 +612,19 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
 }
 
 #define MAXTAMLINE 1001
-
-int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* periodos, int* cur, char** nome){
+TREG* criaReg(int mat, float cr, int tranc, int ch_aprov, int periodos, int cur, char *nome){
+	TREG *r=(TREG*)malloc(sizeof(TREG));
+	r->mat=mat;
+	r->cr=cr;
+	r->ch_aprov=ch_aprov;
+	r->tranc = tranc;
+	r->cur=cur;
+	r->periodos = periodos;
+	strcpy(r->nome,nome);
+	return r;
+}
+//@Deprecated
+int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* periodos, int* cur, char* nome){
 	char linha[MAXTAMLINE+1+1];
 	char *aux;
 	if (fgets(linha,MAXTAMLINE+1,fp)==NULL) return 0;
@@ -521,8 +648,8 @@ int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* perio
 	aux=strtok(NULL, " ");
 	*cur=atoi(aux);
 	printf("%d\n",*cur);
-	*nome=strtok(NULL,"\n");
-	printf("%s\n",*nome);
+	nome=strtok(NULL,"\n");
+	printf("%s\n",nome);
 	return 7;
 }
 
@@ -532,25 +659,39 @@ int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* perio
  *
  * retorno: nova árvore */
 TABM * novaArv (char *nome, int t){
+	//criaReg(int mat, float cr, int tranc, int ch_aprov, int periodos, int cur, char *nome)
+   int mat,tranc,ch_aprov,cur,periodos,ctrl = 1,i;
+   float cr;
+   char c;
    FILE *fp = fopen(nome,"rt");
    if (!fp) exit(1);
    TABM *a = Cria(t);
-   TREG *aux = (TREG *) malloc (sizeof(TREG));
-   int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
+   TREG *aux;
+   while(ctrl>0){
+		ctrl = fscanf(fp,"%d %f %d %d %d %d ", &mat, &cr, &tranc, &ch_aprov, &periodos, &cur);
+		if (ctrl != 6) break;
+		i = 0;
+		while(i<100){//tamanho máximo do nome
+			c = fgetc(fp);//leitura char a char do nome
+			if(c == '\n' || c == EOF)break;
+			nome[i] = c;
+			i++;
+		}
+		nome[i]='\0';
+		if(mat>=0){
+			aux = criaReg(mat, cr, tranc, ch_aprov, periodos, cur, nome);
+			//TABM *Insere(TABM *a, int k, int t, TREG *dado)
+			a = Insere(a, mat, t,aux);
+		}
+	}
+   /*int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
    printf("%d\n",aux->mat);
    printf("%f\n",aux->cr);
    printf("%d\n",aux->tranc);
    printf("%d\n",aux->ch_aprov);
    printf("%d\n",aux->periodos);
    printf("%d\n",aux->cur);
-   printf("%s\n",aux->nome);
-   while (r == 7){
-      a = Insere(a,aux->mat,t,aux);
-      Imprime(a,0);
-      printf("%s", "Acabou uma...\n");
-      r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
-   }
-   free(aux);
+   printf("%s\n",aux->nome);*/
    fclose(fp);
    return a;
 }
@@ -562,7 +703,7 @@ TABM * novaArv (char *nome, int t){
  * retorno: nova árvore */
 int gravarDados (TABM *a, char *saida){
   if (!a) {
-     printf("%s","Árvore não existe");
+     printf("%s","Árvore não existe.\n");
      return 0;
   }
   FILE *fp = fopen(saida,"wt+");
@@ -584,10 +725,11 @@ int gravarDados (TABM *a, char *saida){
     a = a->prox;
   }
   fclose(fp);
-  free(aux);
   Libera(a);
   a=NULL;
-  printf("Árvore enviada para o arquivo e liberada.\n");
+  printf("\n---------------\n");
+  printf("Árvore enviada para o arquivo e liberada.");
+  printf("\n---------------\n");
   return 1;
 }
 
@@ -598,23 +740,26 @@ int gravarDados (TABM *a, char *saida){
  *
  * retorno: nova árvore */
 void imprimeinfo(TABM* a, int mat){
-    if (!a){
-	printf("Árvore não existe");
-    	exit(1);
-    }
-    TABM * aux = (TABM*) malloc (sizeof(TABM));
+    TABM *aux = (TABM*) malloc (sizeof(TABM));
     aux = Busca(a,mat);
     if (!aux){
-	printf("Matrícula não existe");
-    	exit(1);
+	printf("\n\n---------------\n");
+	printf("Matrícula não existe.");
+	printf("\n---------------\n\n");
+    	return;
     }
     int i;
     while ((i < aux->nchaves) && (mat > aux->chave[i])) i++;
-    printf("Matricula: %d ",aux->info[i]->mat);
-    printf("CR: %f ",aux->info[i]->cr);
-    printf("Trancamentos: %d ",aux->info[i]->tranc);
-    printf("CH total: %d \n Períodos cursados: %d \n Currículo: %d ", aux->info[i]->ch_aprov,aux->info[i]->periodos,aux->info[i]->cur);
-    printf("Nome: %s ",aux->info[i]->nome);
+    printf("------------------------\n\n");
+    printf("Matricula: %d\n",aux->info[i]->mat);
+    printf("CR: %f\n",aux->info[i]->cr);
+    printf("Trancamentos: %d\n",aux->info[i]->tranc);
+    printf("CH total: %d\n", aux->info[i]->ch_aprov);
+    printf("Períodos cursados: %d\n",aux->info[i]->periodos);
+    printf("Currículo: %d\n",aux->info[i]->cur);
+    printf("Nome: %s\n\n",aux->info[i]->nome);
+    printf("------------------------\n\n\n");
+    free(aux);
 }
   
 int main () {
@@ -635,42 +780,56 @@ int main () {
       printf("6 - mostrar arvore\n");
       printf("7 - exibir informações\n");
       printf("9 - escrever arvore no arquivo\n");
+      printf("Opção: ");
       scanf("%d", &op);
       fflush(stdin);
     }while(op<0||(op!=9&&op>7));
     switch(op)
     {
       case 0:
+	{
+	printf("\n\n-------------\n");
+	printf("\n\n É hora de dar tchau! \n\n");
+	printf("\n-------------\n\n");
         return 0;
         break;
+	}
       case 1:
 		{
         	char nome[501];
-        	printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
+        	printf("\nDigite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
  	      	scanf("%s",nome);
         	printf("Digite o t : ");
         	scanf("%d",&t);
         	if(arvore)
            		Libera(arvore);
         	arvore=novaArv(nome,t);
-			printf("Carreguei a arvore\n");
+		printf("Carregando a arvore:\n");
+		printf("\n\n------------------------\n\n");
         	Imprime(arvore,0);
+		printf("\n\n------------------------\n\n");
         	break;
 		}
       case 2:
 		{
-        	TREG* novo=(TREG*)calloc(sizeof(TREG),1);
+		if (!arvore) {
+			printf("\nBase de dados não carregada.\n\n");
+			break;
+		}
+        	TREG* novo=(TREG*)calloc(1,sizeof(TREG));
         	int mat=-1;
         	float cr=-1;
         	int tranc=0;
         	int ch_aprov, periodos, cur;    //carga horária com aprovação, número de períodos e currículo.
-        	char *nomeCandidato=(char*)calloc(sizeof(char),101);
+        	char nomeCandidato[101];
+		int i;
+		for (i=0;i<101;i++) nomeCandidato[i] = '\0';
         	if(!novo || !nomeCandidato)
         	{
           		fprintf(stderr,"%s:%d alocacao de memoria falhou, libere memoria \n", __FILE__, __LINE__);
           		break;
         	}
-        	printf("Digite a matricula : ");
+        	printf("\nDigite a matricula : ");
         	scanf("%d",&mat);
         	printf("Digite o cr : ");
         	scanf("%f", &cr);
@@ -692,28 +851,47 @@ int main () {
         	novo->cur=cur;
         	strcpy(novo->nome,nomeCandidato);
         	arvore=Insere(arvore,mat,t,novo);
-        	Imprime(arvore,0);
+		printf("\n\n------------------------\n\n");        	
+		Imprime(arvore,0);
+		printf("\n\n------------------------\n\n");
         	break;
 		}
       case 3:
 		{
+		if (!arvore) {
+			printf("\nBase de dados não carregada.\n\n");
+			break;
+		}
         	int mat;
-        	printf("Digite a matricula a remover : ");
+        	printf("\nDigite a matricula a remover : ");
         	scanf("%d", &mat);
         	arvore=retira(arvore,mat,t);
+		printf("\n\n------------------------\n\n");
         	Imprime(arvore,0);
-
+		printf("\n\n------------------------\n\n");
         	break;
 		}
       case 4:
-        arvore=otimizaArvore(arvore,t);
-        Imprime(arvore,0);
-        break;
+	{	
+		if (!arvore) {
+			printf("\nBase de dados não carregada.\n\n");
+			break;
+		}
+		arvore=otimizaArvore(arvore,t);
+		printf("\n\n------------------------\n\n");
+		Imprime(arvore,0);
+		printf("\n\n------------------------\n\n");
+		break;
+	}
       case 5:
 		{
+			if (!arvore) {
+				printf("\nÁrvore não carregada.\n\n");
+				break;
+			}
 			int op;
 			int mat;
-			printf("1- cr; 2- carga horária; 3- trancamento; 4- períodos;");
+			printf("\n1- cr; 2- carga horária; 3- trancamento; 4- períodos;");
 			do{
 				printf("Digite o que deseja Alterar : ");
 				scanf("%d", &op);
@@ -728,7 +906,9 @@ int main () {
 								printf("Digite o cr : ");
 								scanf("%f", &cr);
 								arvore=alteraCR(arvore,t,mat,cr);
+								printf("\n\n------------------------\n\n");
 								Imprime(arvore,0);
+								printf("\n\n------------------------\n\n");
 								break;
 							}
 					case 2:
@@ -737,7 +917,9 @@ int main () {
 								printf("Digite a Carga Horaria : ");
 								scanf("%d", &carOraria);
 								arvore=alteraCH(arvore,t,mat,carOraria);
+								printf("\n\n------------------------\n\n");			
 								Imprime(arvore,0);
+								printf("\n\n------------------------\n\n");
 								break;	
 							}
 					case 3:
@@ -746,7 +928,9 @@ int main () {
 									printf("Digite o numero de trancamentos : ");
 									scanf("%d", &tranc);
 									arvore=alteraTranc(arvore,t,mat,tranc);
+									printf("\n\n------------------------\n\n");
 									Imprime(arvore,0);
+									printf("\n\n------------------------\n\n");
 									break;
 							}
 					case 4:			
@@ -755,19 +939,35 @@ int main () {
 									printf("Digite o numero de periodos : ");
 									scanf("%d", &periodos);
 									arvore=alteraPeriodo(arvore,t,mat,periodos);
+									printf("\n\n------------------------\n\n");
 									Imprime(arvore,0);
+									printf("\n\n------------------------\n\n");
 									break;
 							}
 			}
         	// 1- cr; 2- carga horária; 3- trancamento; 4- períodos;
-			// 
+			break;
 		}
       case 6:
-        Imprime(arvore,0);
-        break;
+	{	
+		if (!arvore) {
+			printf("Árvore não carregada.\n\n");
+			break;
+		}
+		printf("\n\n-----------------------\n\n");
+		Imprime(arvore,0);
+		printf("\n\n-----------------------\n\n");
+		break;
+	}
       case 7:
 	{
-	  printf("Digite a matrícula desejada:\n");
+	  if (!arvore) {
+		printf("\n\n---------------\n");		
+		printf("\nÁrvore não carregada.\n");
+		printf("\n---------------\n\n");
+		break;
+	  }
+	  printf("Digite a matrícula desejada: ");
 	  int mat;
 	  scanf("%d",&mat);
 	  imprimeinfo(arvore,mat);
@@ -775,6 +975,10 @@ int main () {
 	}
       case 9:
 		{
+		if (!arvore) {
+			printf("Base de dados não carregada.\n\n");
+			break;
+		}
         	//char nomeArquivo[501];
         	//printf("Digite o nome do arquivo(no maximo 500 caracteres, os excedentes serao ignorados) : ");
         	//scanf("%500[^\n]",nomeArquivo);
