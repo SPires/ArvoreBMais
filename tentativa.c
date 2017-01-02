@@ -137,9 +137,16 @@ TABM* remover(TABM* arv, int ch, int t){
 		int j;
 		for (j=i; j < arv->nchaves; j++){
 			arv->chave[j] = arv->chave[j+1];
-			arv->info[j] = arv->info[j+1];
+			arv->info[j]->mat = arv->info[j+1]->mat;
+			arv->info[j]->cr=arv->info[j+1]->cr;
+			arv->info[j]->tranc=arv->info[j+1]->tranc;
+			arv->info[j]->ch_aprov=arv->info[j+1]->ch_aprov;
+			arv->info[j]->periodos=arv->info[j+1]->periodos;
+			arv->info[j]->cur=arv->info[j+1]->cur;
+			strcpy(arv->info[j]->nome,arv->info[j+1]->nome);
 		}
 		arv->nchaves--;
+		return arv;
 	}
 	int i=0;
 	while ((i < arv->nchaves)&&(ch > arv->chave[i])) i++;
@@ -154,14 +161,27 @@ TABM* remover(TABM* arv, int ch, int t){
 				arv->filho[0]->nchaves++;
 				arv->filho[0]->chave[arv->nchaves-1] = arv->filho[1]->chave[0];
 				if (arv->filho[0]->folha){
-					arv->filho[0]->info[arv->nchaves-1] = arv->filho[1]->info[0];
+					arv->filho[0]->info[arv->nchaves-1]->mat = arv->filho[1]->info[0]->mat;
+					arv->filho[0]->info[arv->nchaves-1]->cr=arv->filho[1]->info[0]->cr;
+					arv->filho[0]->info[arv->nchaves-1]->tranc=arv->filho[1]->info[0]->tranc;
+					arv->filho[0]->info[arv->nchaves-1]->ch_aprov=arv->filho[1]->info[0]->ch_aprov;
+					arv->filho[0]->info[arv->nchaves-1]->periodos=arv->filho[1]->info[0]->periodos;
+					arv->filho[0]->info[arv->nchaves-1]->cur=arv->filho[1]->info[0]->cur;
+					strcpy(arv->filho[0]->info[arv->nchaves-1]->nome,arv->filho[1]->info[0]->nome);
+
 				}
 				arv->chave[0] = arv->filho[1]->chave[1];
 				int j;				
 				for (j=i; j < arv->filho[1]->nchaves; j++){
 					arv->filho[1]->chave[j] = arv->filho[1]->chave[j+1];
 					if (arv->filho[1]->folha){
-						arv->filho[1]->info[j] = arv->filho[1]->info[j+1];
+						arv->filho[1]->info[j]->mat = arv->filho[1]->info[j+1]->mat;
+						arv->filho[1]->info[j]->cr=arv->filho[1]->info[j+1]->cr;
+						arv->filho[1]->info[j]->tranc=arv->filho[1]->info[j+1]->tranc;
+						arv->filho[1]->info[j]->ch_aprov=arv->filho[1]->info[j+1]->ch_aprov;
+						arv->filho[1]->info[j]->periodos=arv->filho[1]->info[j+1]->periodos;
+						arv->filho[1]->info[j]->cur=arv->filho[1]->info[j+1]->cur;
+						strcpy(arv->filho[1]->info[j]->nome,arv->filho[1]->info[j+1]->nome);
 					}
 				}
 				arv->filho[1]->nchaves--;
@@ -175,7 +195,14 @@ TABM* remover(TABM* arv, int ch, int t){
 				for (j=0; j < arv->filho[1]->nchaves; j++){
 					arv->filho[0]->chave[arv->filho[0]->nchaves + j] = arv->filho[1]->chave[j];
 					if (arv->filho[0]->folha){
-						arv->filho[0]->info[arv->filho[0]->nchaves + j] = arv->filho[1]->info[j];
+						
+						arv->filho[0]->info[arv->filho[0]->nchaves + j]->mat = arv->filho[1]->info[j]->mat;
+						arv->filho[0]->info[arv->filho[0]->nchaves + j]->cr=arv->filho[1]->info[j]->cr;
+						arv->filho[0]->info[arv->filho[0]->nchaves + j]->tranc=arv->filho[1]->info[j]->tranc;
+						arv->filho[0]->info[arv->filho[0]->nchaves + j]->ch_aprov=arv->filho[1]->info[j]->ch_aprov;
+						arv->filho[0]->info[arv->filho[0]->nchaves + j]->periodos=arv->filho[1]->info[j]->periodos;
+						arv->filho[0]->info[arv->filho[0]->nchaves + j]->cur=arv->filho[1]->info[j]->cur;
+						strcpy(arv->filho[0]->info[arv->filho[0]->nchaves + j]->nome,arv->filho[1]->info[j]->nome);
 					}
 				}
 				arv->filho[0]->prox = arv->filho[1]->prox;
@@ -199,7 +226,7 @@ TABM* remover(TABM* arv, int ch, int t){
 			}
 			if (arv->filho[i]->nchaves >= t){
 				printf("Aplicação do caso 3A.\n");
-				arv->filho[i+1]++;
+				//arv->filho[i+1]++;
 				int ult = arv->filho[i+1]->nchaves, j;
 				for (j=ult; j >= 1; j--){
 					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
@@ -209,7 +236,14 @@ TABM* remover(TABM* arv, int ch, int t){
 				}
 				arv->filho[i+1]->chave[0] = arv->filho[i]->chave[arv->filho[i]->nchaves-1];
 				if (arv->filho[i+1]->folha){
-					arv->filho[i+1]->info[0] = arv->filho[i]->info[arv->filho[i]->nchaves-1];
+					arv->filho[i+1]->info[0]->mat = arv->filho[i]->info[arv->filho[i]->nchaves-1]->mat;
+					arv->filho[i+1]->info[0]->cr=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cr;
+					arv->filho[i+1]->info[0]->tranc=arv->filho[i]->info[arv->filho[i]->nchaves-1]->tranc;
+					arv->filho[i+1]->info[0]->ch_aprov=arv->filho[i]->info[arv->filho[i]->nchaves-1]->ch_aprov;
+					arv->filho[i+1]->info[0]->periodos=arv->filho[i]->info[arv->filho[i]->nchaves-1]->periodos;
+					arv->filho[i+1]->info[0]->cur=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cur;
+					strcpy(arv->filho[i+1]->info[0]->nome,arv->filho[i]->info[arv->filho[i]->nchaves-1]->nome);
+					
 				}
 				arv->filho[i]->nchaves--;
 				arv->chave[arv->nchaves-1] = arv->filho[i+1]->chave[0];
@@ -224,7 +258,13 @@ TABM* remover(TABM* arv, int ch, int t){
 				for (j=0; j < arv->filho[i+1]->nchaves; j++){
 					arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
 					if (arv->filho[i]->folha){
-						arv->filho[i]->info[partida+j] = arv->filho[i+1]->info[j];
+						arv->filho[i]->info[partida+j]->mat = arv->filho[i+1]->info[j]->mat;
+						arv->filho[i]->info[partida+j]->cr=arv->filho[i+1]->info[j]->cr;
+						arv->filho[i]->info[partida+j]->tranc=arv->filho[i+1]->info[j]->tranc;
+						arv->filho[i]->info[partida+j]->ch_aprov=arv->filho[i+1]->info[j]->ch_aprov;
+						arv->filho[i]->info[partida+j]->periodos=arv->filho[i+1]->info[j]->periodos;
+						arv->filho[i]->info[partida+j]->cur=arv->filho[i+1]->info[j]->cur;
+						strcpy(arv->filho[i]->info[partida+j]->nome,arv->filho[i+1]->info[j]->nome);
 					}
 				}
 				arv->nchaves--;
@@ -253,7 +293,13 @@ TABM* remover(TABM* arv, int ch, int t){
 				for (j=i; j < arv->filho[i+1]->nchaves; j++){
 					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j+1];
 					if (arv->filho[i+1]->folha){
-						arv->filho[i+1]->info[j] = arv->filho[i+1]->info[j+1];
+						arv->filho[i+1]->info[j]->mat = arv->filho[i+1]->info[j+1]->mat;
+						arv->filho[i+1]->info[j]->cr=arv->filho[i+1]->info[j+1]->cr;
+						arv->filho[i+1]->info[j]->tranc=arv->filho[i+1]->info[j+1]->tranc;
+						arv->filho[i+1]->info[j]->ch_aprov=arv->filho[i+1]->info[j+1]->ch_aprov;
+						arv->filho[i+1]->info[j]->periodos=arv->filho[i+1]->info[j+1]->periodos;
+						arv->filho[i+1]->info[j]->cur=arv->filho[i+1]->info[j+1]->cur;
+						strcpy(arv->filho[i+1]->info[j]->nome,arv->filho[i+1]->info[j+1]->nome);
 					}
 				}
 				arv->filho[i+1]->nchaves--;
@@ -266,13 +312,25 @@ TABM* remover(TABM* arv, int ch, int t){
 				int j;
 				for (j=arv->filho[i]->nchaves-1; j >= 1; j--){
 					arv->filho[i]->chave[j] = arv->filho[i]->chave[j-1];
-					if (arv->filho[i]->folha){
-						arv->filho[i]->info[j] = arv->filho[i]->info[j-1];
+					if (arv->filho[i]->folha){						
+						arv->filho[i]->info[j]->mat = arv->filho[i]->info[j-1]->mat;
+						arv->filho[i]->info[j]->cr=arv->filho[i]->info[j-1]->cr;
+						arv->filho[i]->info[j]->tranc=arv->filho[i]->info[j-1]->tranc;
+						arv->filho[i]->info[j]->ch_aprov=arv->filho[i]->info[j-1]->ch_aprov;
+						arv->filho[i]->info[j]->periodos=arv->filho[i]->info[j-1]->periodos;
+						arv->filho[i]->info[j]->cur=arv->filho[i]->info[j-1]->cur;
+						strcpy(arv->filho[i]->info[j]->nome,arv->filho[i]->info[j-1]->nome);
 					}
 				}
 				arv->filho[i]->chave[0] = arv->filho[i-1]->chave[arv->filho[i-1]->nchaves-1];
 				if (arv->filho[i]->folha){
-					arv->filho[i]->info[0] = arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1];
+					arv->filho[i]->info[0]->mat = arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->mat;
+					arv->filho[i]->info[0]->cr=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->cr;
+					arv->filho[i]->info[0]->tranc=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->tranc;
+					arv->filho[i]->info[0]->ch_aprov=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->ch_aprov;
+					arv->filho[i]->info[0]->periodos=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->periodos;
+					arv->filho[i]->info[0]->cur=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->cur;
+					strcpy(arv->filho[i]->info[0]->nome,arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->nome);
 				}
 				arv->chave[i-1] = arv->filho[i]->chave[0];
 				arv->filho[i-1]->nchaves--;
@@ -310,14 +368,26 @@ TABM* remover(TABM* arv, int ch, int t){
 				arv->filho[i+1]->nchaves++;
 				arv->filho[i+1]->chave[arv->nchaves-1] = arv->filho[i+2]->chave[0];
 				if (arv->filho[i+1]->folha){
-					arv->filho[i+1]->info[arv->nchaves-1] = arv->filho[i+2]->info[0];
+					arv->filho[i+1]->info[arv->nchaves-1]->mat = arv->filho[i+2]->info[0]->mat;
+					arv->filho[i+1]->info[arv->nchaves-1]->cr=arv->filho[i+2]->info[0]->cr;
+					arv->filho[i+1]->info[arv->nchaves-1]->tranc=arv->filho[i+2]->info[0]->tranc;
+					arv->filho[i+1]->info[arv->nchaves-1]->ch_aprov=arv->filho[i+2]->info[0]->ch_aprov;
+					arv->filho[i+1]->info[arv->nchaves-1]->periodos=arv->filho[i+2]->info[0]->periodos;
+					arv->filho[i+1]->info[arv->nchaves-1]->cur=arv->filho[i+2]->info[0]->cur;
+					strcpy(arv->filho[i+1]->info[arv->nchaves-1]->nome,arv->filho[i+2]->info[0]->nome);			
 				}
 				arv->chave[i+1] = arv->filho[i+2]->chave[1];
 				int j;				
 				for (j=i; j < arv->filho[i+2]->nchaves; j++){
 					arv->filho[i+2]->chave[j] = arv->filho[i+2]->chave[j+1];
 					if (arv->filho[i+2]->folha){
-						arv->filho[i+2]->info[j] = arv->filho[i+2]->info[j+1];
+						arv->filho[i+2]->info[j]->mat = arv->filho[i+2]->info[j+1]->mat;
+						arv->filho[i+2]->info[j]->cr=arv->filho[i+2]->info[j+1]->cr;
+						arv->filho[i+2]->info[j]->tranc=arv->filho[i+2]->info[j+1]->tranc;
+						arv->filho[i+2]->info[j]->ch_aprov=arv->filho[i+2]->info[j+1]->ch_aprov;
+						arv->filho[i+2]->info[j]->periodos=arv->filho[i+2]->info[j+1]->periodos;
+						arv->filho[i+2]->info[j]->cur=arv->filho[i+2]->info[j+1]->cur;
+						strcpy(arv->filho[i+2]->info[j]->nome,arv->filho[i+2]->info[j+1]->nome);
 					}
 				}
 				arv->filho[i+2]->nchaves--;
@@ -331,12 +401,24 @@ TABM* remover(TABM* arv, int ch, int t){
 				for (j=arv->filho[i+1]->nchaves-1; j >= 1; j--){
 					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
 					if (arv->filho[i+1]->folha){
-						arv->filho[i+1]->info[j] = arv->filho[i+1]->info[j-1];
+						arv->filho[i+1]->info[j]->mat = arv->filho[i+1]->info[j-1]->mat;
+						arv->filho[i+1]->info[j]->cr=arv->filho[i+1]->info[j-1]->cr;
+						arv->filho[i+1]->info[j]->tranc=arv->filho[i+1]->info[j-1]->tranc;
+						arv->filho[i+1]->info[j]->ch_aprov=arv->filho[i+1]->info[j-1]->ch_aprov;
+						arv->filho[i+1]->info[j]->periodos=arv->filho[i+1]->info[j-1]->periodos;
+						arv->filho[i+1]->info[j]->cur=arv->filho[i+1]->info[j-1]->cur;
+						strcpy(arv->filho[i+1]->info[j]->nome,arv->filho[i+1]->info[j-1]->nome);
 					}
 				}
 				arv->filho[i]->chave[0] = arv->filho[i]->chave[arv->filho[i]->nchaves-1];
 				if (arv->filho[i]->folha){
-					arv->filho[i+1]->info[0] = arv->filho[i]->info[arv->filho[i]->nchaves-1];
+					arv->filho[i+1]->info[0]->mat = arv->filho[i]->info[arv->filho[i]->nchaves-1]->mat;
+					arv->filho[i+1]->info[0]->cr=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cr;
+					arv->filho[i+1]->info[0]->tranc=arv->filho[i]->info[arv->filho[i]->nchaves-1]->tranc;
+					arv->filho[i+1]->info[0]->ch_aprov=arv->filho[i]->info[arv->filho[i]->nchaves-1]->ch_aprov;
+					arv->filho[i+1]->info[0]->periodos=arv->filho[i]->info[arv->filho[i]->nchaves-1]->periodos;
+					arv->filho[i+1]->info[0]->cur=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cur;
+					strcpy(arv->filho[i+1]->info[0]->nome,arv->filho[i]->info[arv->filho[i]->nchaves-1]->nome);
 				}
 				arv->chave[i] = arv->filho[i+1]->chave[0];
 				arv->filho[i]->nchaves--;
@@ -486,17 +568,19 @@ TABM * otimizaArvore(TABM *a, int t){
 TABM * removeFormandos(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM));
-    if (!a->folha) a = primeiraFolha(a);
+    TABM * folha = NULL;
+    if (!a->folha) folha = primeiraFolha(a);
+    else folha=a;
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
-    while (a){
+    while (folha){
         for (i=0;i<a->nchaves;i++){
             dado = a->info[i];
-            if (dado->cur == 1 && dado->ch_aprov == 2955) remover(a,dado->mat,t);
-            if (dado->cur == 2 && dado->ch_aprov == 3524) remover(a,dado->mat,t);
-            if (dado->cur == 3 && dado->ch_aprov == 3200) remover(a,dado->mat,t);
+            if (dado->cur == 1 && dado->ch_aprov == 2955) {a=remover(a,dado->mat,t); return removeFormandos(a,t);}
+            if (dado->cur == 2 && dado->ch_aprov == 3524) {a=remover(a,dado->mat,t); return removeFormandos(a,t);}
+            if (dado->cur == 3 && dado->ch_aprov == 3200) {a=remover(a,dado->mat,t); return removeFormandos(a,t);}
         }
-        a = a->prox;
+        folha = folha->prox;
     }
     free(dado);
     free(aux);
@@ -507,6 +591,7 @@ TABM * removePeloTempoDeCurso(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM));
     if (!a->folha) aux = primeiraFolha(a);
+    else aux=a;
     TREG * dado = (TREG *) malloc (sizeof(TREG));
     int i;
     while (aux){
@@ -514,21 +599,21 @@ TABM * removePeloTempoDeCurso(TABM * a, int t){
             dado = aux->info[i];
             if (dado->cur == 1){
               if (dado->periodos == 16 && dado->ch_aprov !=2955)
-                 remover(aux,dado->mat,t);
+	      	{a=remover(aux,dado->mat,t); return removePeloTemporCurso(a,t);}
               if (dado->periodos == 8 && dado->ch_aprov < 1477)
-                 remover(aux,dado->mat,t);
+                 {a=remover(aux,dado->mat,t); return removePeloTemporCurso(a,t);}
             }
             if (dado->cur == 2){
               if (dado->periodos == 12 && dado->ch_aprov !=3524)
-                 remover(aux,dado->mat,t);
+                 {a=remover(aux,dado->mat,t); return removePeloTemporCurso(a,t);}
               if (dado->periodos == 8 && dado->ch_aprov < 1762)
-                 remover(aux,dado->mat,t);
+                 {a=remover(aux,dado->mat,t); return removePeloTemporCurso(a,t);}
             }
             if (dado->cur == 3){
               if (dado->periodos == 12 && dado->ch_aprov !=3200)
-                 remover(aux,dado->mat,t);
+                 {a=remover(aux,dado->mat,t); return removePeloTemporCurso(a,t);}
               if (dado->periodos == 8 && dado->ch_aprov < 1600)
-                 remover(aux,dado->mat,t);
+                 {a=remover(aux,dado->mat,t); return removePeloTemporCurso(a,t);}
             }
         }
         aux = aux->prox;
