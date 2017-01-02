@@ -88,11 +88,15 @@ TABM *Busca(TABM* x, int ch){
 	int i=0;
 	if (x->folha) {
 		while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
+		if(i==x->nchaves) return NULL;
 		if (ch == x->chave[i]) return x;
 	}
-	while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
-	if (ch == x->chave[i]) return Busca(x->filho[i+1],ch);
-	return Busca(x->filho[i],ch);
+	else{
+		while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
+		if (i<x->nchaves && ch == x->chave[i]) return Busca(x->filho[i+1],ch);
+		return Busca(x->filho[i],ch);
+	}
+	
 }
 
     
