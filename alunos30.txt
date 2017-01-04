@@ -1,0 +1,30 @@
+1 7.600000 0 1355 9 1 Andy Murray
+2 6.800000 0 2008 15 1 Novak Djokovic
+3 8.300000 2 121 1 2 Stan Wawrinka
+4 0.000000 3 1351 1 2 Milos Raonic
+5 5.900000 3 3279 11 2 Kei Nishikori
+6 6.600000 0 1466 9 2 Gael Monfils
+7 2.600000 3 151 9 3 Marin Cilic
+8 7.600000 3 2929 6 1 Rafael Nadal
+9 7.200000 4 2226 11 1 Dominic Thiem
+10 8.900000 3 806 7 1 Tomas Berdych
+11 2.400000 2 879 5 3 David Goffin
+12 9.000000 2 2687 1 1 Jo-Wilfried Tsonga
+13 5.200000 2 1021 12 3 Nick Kyrgios
+14 0.900000 1 3340 1 2 Roberto Bautista Agut
+15 2.700000 1 3221 7 2 Lucas Pouille
+16 0.500000 4 2684 10 2 Roger Federer
+17 0.100000 0 2203 11 3 Grigor Dimitrov
+18 7.300000 3 3523 11 2 Richard Gasquet
+19 3.500000 1 1517 10 1 John Isner
+20 8.400000 2 862 5 3 Ivo Karlovic
+21 2.900000 2 628 2 2 David Ferrer
+22 0.300000 4 1883 6 2 Pablo Cuevas
+23 5.600000 3 2851 8 3 Jack Sock
+24 2.100000 0 2287 2 3 Alexander Zverev
+25 0.000000 1 1224 1 1 Gilles Simon
+26 2.400000 4 579 4 3 Bernard Tomic
+27 1.500000 3 2180 5 3 Albert Ramos-Vinolas
+28 1.400000 2 2069 11 2 Feliciano Lopez
+29 5.600000 4 522 12 2 Viktor Troicki
+30 5.700000 0 888 6 2 Pablo Carreno Busta
