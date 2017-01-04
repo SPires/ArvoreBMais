@@ -1,6 +1,0 @@
-* Insere não está permitindo colocar o nome do aluno. Após inserir o currículo, ele realiza a inserção e exibe a árvore.
-* Não está removendo algumas matrículas
-* Falha de segmentação na exibição de informações (REFAZER)
-* Impossível testar a otimização e alteração
-* Falha de segmentação na escrita em arquivo
-* Não é possível escrever o nome do usuário no arquivo, embora a função parseFile consiga retirar o nome do arquivo original.
