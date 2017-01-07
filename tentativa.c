@@ -98,8 +98,7 @@ TABM *Busca(TABM* x, int ch){
 	}
 	
 }
-
-    
+   
 TABM* remover(TABM* arv, int ch, int t);
 
 /* Chamada segura à retirada
@@ -125,328 +124,175 @@ TABM* retira(TABM* arv, int k, int t){
  *
  * retorno: nova árvore */ 
 TABM* remover(TABM* arv, int ch, int t){
-	if (arv->folha){
-		printf("Removendo %d pelo Caso 1.\n",ch);		
-		int i=0;
-		while ((i < arv->nchaves)&&(ch > arv->chave[i])) i++;
-		if (i == arv->nchaves-1){
-			arv->info[i] = NULL;
-			arv->nchaves--;
-			return arv;
-		}
-		int j;
-		for (j=i; j < arv->nchaves; j++){
-			arv->chave[j] = arv->chave[j+1];
-			arv->info[j]->mat = arv->info[j+1]->mat;
-			arv->info[j]->cr=arv->info[j+1]->cr;
-			arv->info[j]->tranc=arv->info[j+1]->tranc;
-			arv->info[j]->ch_aprov=arv->info[j+1]->ch_aprov;
-			arv->info[j]->periodos=arv->info[j+1]->periodos;
-			arv->info[j]->cur=arv->info[j+1]->cur;
-			strcpy(arv->info[j]->nome,arv->info[j+1]->nome);
-		}
-		arv->nchaves--;
+	if(!arv) {
+		printf("Árvore vazia ou não carregada.");
 		return arv;
 	}
-	int i=0;
-	while ((i < arv->nchaves)&&(ch > arv->chave[i])) i++;
-	if (i==0){	
-		if (ch < arv->chave[0]){
-			if (arv->filho[0]->nchaves >= t){
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[0],ch,t);
+	int i;
+	printf("Removendo %d...\n", ch);
+	for(i = 0; i<arv->nchaves && arv->chave[i] < ch; i++);
+	if(arv->folha){ //CASO 1
+      printf("\nAplicando o CASO 1\n");
+      int j;
+      for(j=i; j<arv->nchaves-1;j++){
+		  arv->chave[j] = arv->chave[j+1];
+		  arv->info[j] = arv->info[j+1];
+		  arv->info[j+1] = NULL;
+	  }
+      arv->nchaves--;
+      return arv;      
+	}
+	TABM *y = arv->filho[i], *z = NULL, *anterior = NULL;
+	
+	if (y->nchaves == t-1){
+		
+		//Caso 3A
+		
+		if((i < arv->nchaves) && (arv->filho[i+1]->nchaves >=t)){
+			printf("\nAplicando o CASO 3A.\n");
+			z = arv->filho[i+1];
+			if (y->folha){
+				y->chave[t-1] = z->chave[0];
+				y->info[t-1] = z->info[0];
+				z->info[0] = NULL;
+				arv->chave[i] = z->chave[1];
+				int k;
+				for (k=1; k < z->nchaves; k++){
+					z->chave[k-1] = z->chave[k];
+					z->info[k-1] = z->info[k];
+					z->info[k] = NULL;
+				}
+				z->nchaves--;
+				printf("\nUma chamada recursiva.\n");
+				arv->filho[i] = remover(arv->filho[i], ch, t);
+				return arv;
 			}
-			if (arv->filho[1]->nchaves >= t){
-				printf("Aplicação do caso 3A.\n");
-				arv->filho[0]->nchaves++;
-				arv->filho[0]->chave[arv->nchaves-1] = arv->filho[1]->chave[0];
-				if (arv->filho[0]->folha){
-					arv->filho[0]->info[arv->nchaves-1]->mat = arv->filho[1]->info[0]->mat;
-					arv->filho[0]->info[arv->nchaves-1]->cr=arv->filho[1]->info[0]->cr;
-					arv->filho[0]->info[arv->nchaves-1]->tranc=arv->filho[1]->info[0]->tranc;
-					arv->filho[0]->info[arv->nchaves-1]->ch_aprov=arv->filho[1]->info[0]->ch_aprov;
-					arv->filho[0]->info[arv->nchaves-1]->periodos=arv->filho[1]->info[0]->periodos;
-					arv->filho[0]->info[arv->nchaves-1]->cur=arv->filho[1]->info[0]->cur;
-					strcpy(arv->filho[0]->info[arv->nchaves-1]->nome,arv->filho[1]->info[0]->nome);
-
+			y->chave[t-1] = arv->chave[i];
+			y->nchaves++;
+			arv->chave[i] = z->chave[0];     //dar a arv uma chave de z
+			int j;
+			for(j=0; j < z->nchaves-1; j++)  //ajustar chaves de z
+				z->chave[j] = z->chave[j+1];
+			y->filho[y->nchaves] = z->filho[0]; //enviar ponteiro menor de z para o novo elemento em y
+			for(j=0; j < z->nchaves; j++)       //ajustar filhos de z
+				z->filho[j] = z->filho[j+1];
+			z->nchaves--;
+			printf("\nUma chamada recursiva.\n");
+			arv->filho[i] = remover(arv->filho[i], ch, t);
+			return arv;
+    }
+		if((i > 0) && (!z) && (arv->filho[i-1]->nchaves >=t)){
+			printf("\nAplicando o CASO 3A.\n");
+			z = arv->filho[i-1];
+			if (y->folha){
+				int k;
+				for (k=y->nchaves; k > 0; k--){
+					y->chave[k] = y->chave[k-1];
+					y->info[k] = y->info[k-1];
+					y->info[k-1] = NULL;
 				}
-				arv->chave[0] = arv->filho[1]->chave[1];
-				int j;				
-				for (j=i; j < arv->filho[1]->nchaves; j++){
-					arv->filho[1]->chave[j] = arv->filho[1]->chave[j+1];
-					if (arv->filho[1]->folha){
-						arv->filho[1]->info[j]->mat = arv->filho[1]->info[j+1]->mat;
-						arv->filho[1]->info[j]->cr=arv->filho[1]->info[j+1]->cr;
-						arv->filho[1]->info[j]->tranc=arv->filho[1]->info[j+1]->tranc;
-						arv->filho[1]->info[j]->ch_aprov=arv->filho[1]->info[j+1]->ch_aprov;
-						arv->filho[1]->info[j]->periodos=arv->filho[1]->info[j+1]->periodos;
-						arv->filho[1]->info[j]->cur=arv->filho[1]->info[j+1]->cur;
-						strcpy(arv->filho[1]->info[j]->nome,arv->filho[1]->info[j+1]->nome);
-					}
-				}
-				arv->filho[1]->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[0],ch,t);
+				y->chave[0] = z->chave[z->nchaves-1];
+				y->info[0] = z->info[z->nchaves-1];
+				z->info[z->nchaves-1] = NULL;
+				y->nchaves++;
+				arv->chave[i-1] = y->chave[0];
+				z->nchaves--;
+				printf("\nUma chamada recursiva.\n");
+				arv->filho[i] = remover(y, ch, t);
+				return arv;
 			}
-			if (arv->filho[1]->nchaves == (t-1)){
-				printf("Aplicação do caso 3B.\n");
-				int j;
-				arv->filho[0]->nchaves = arv->filho[0]->nchaves + arv->filho[1]->nchaves;
-				for (j=0; j < arv->filho[1]->nchaves; j++){
-					arv->filho[0]->chave[arv->filho[0]->nchaves + j] = arv->filho[1]->chave[j];
-					if (arv->filho[0]->folha){
-						
-						arv->filho[0]->info[arv->filho[0]->nchaves + j]->mat = arv->filho[1]->info[j]->mat;
-						arv->filho[0]->info[arv->filho[0]->nchaves + j]->cr=arv->filho[1]->info[j]->cr;
-						arv->filho[0]->info[arv->filho[0]->nchaves + j]->tranc=arv->filho[1]->info[j]->tranc;
-						arv->filho[0]->info[arv->filho[0]->nchaves + j]->ch_aprov=arv->filho[1]->info[j]->ch_aprov;
-						arv->filho[0]->info[arv->filho[0]->nchaves + j]->periodos=arv->filho[1]->info[j]->periodos;
-						arv->filho[0]->info[arv->filho[0]->nchaves + j]->cur=arv->filho[1]->info[j]->cur;
-						strcpy(arv->filho[0]->info[arv->filho[0]->nchaves + j]->nome,arv->filho[1]->info[j]->nome);
-					}
+			int j;
+			for(j = y->nchaves; j>0; j--)               //encaixar lugar da nova chave
+				y->chave[j] = y->chave[j-1];
+			for(j = y->nchaves+1; j>0; j--)             //encaixar lugar dos filhos da nova chave
+				y->filho[j] = y->filho[j-1];
+			y->chave[0] = arv->chave[i-1];              //dar a y a chave i da arv
+			y->nchaves++;
+			arv->chave[i-1] = z->chave[z->nchaves-1];   //dar a arv uma chave de z
+			y->filho[0] = z->filho[z->nchaves];         //enviar ponteiro de z para o novo elemento em y
+			z->nchaves--;
+			printf("\nUma chamada recursiva.\n");
+			arv->filho[i] = remover(y, ch, t);
+			return arv;
+		}
+		
+		//Caso 3B
+		
+		if(!z){ //CASO 3B
+		  if(i < arv->nchaves && arv->filho[i+1]->nchaves == t-1){
+			printf("\nCASO 3B: i menor que nchaves\n");
+			z = arv->filho[i+1];
+			if (y->folha){
+				int k;
+				for (k=0; k < z->nchaves; k++){
+					y->chave[(y->nchaves-1)+k] = z->chave[k];
+					y->info[(y->nchaves-1)+k] = z->info[k];
 				}
-				arv->filho[0]->prox = arv->filho[1]->prox;
-				Libera(arv->filho[1]);
-				arv->nchaves--;
-				for (j=0; j < arv->nchaves; j++){
+				y->nchaves += z->nchaves;
+				y->prox = z->prox;
+				for(j=i; j < arv->nchaves-1; j++){
 					arv->chave[j] = arv->chave[j+1];
-					arv->filho[j+1] = arv->filho[j+2]; 
-				}
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[0],ch,t);
-			}
-
-		}
-	}
-	if (i == arv->nchaves-1){
-		if (ch > arv->chave[i]){
-			if (arv->filho[i+1]->nchaves >= t){
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i],ch,t);
-			}
-			if (arv->filho[i]->nchaves >= t){
-				printf("Aplicação do caso 3A.\n");
-				//arv->filho[i+1]++;
-				int ult = arv->filho[i+1]->nchaves, j;
-				for (j=ult; j >= 1; j--){
-					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
-					if (arv->filho[i+1]->folha){
-						arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
-					}
-				}
-				arv->filho[i+1]->chave[0] = arv->filho[i]->chave[arv->filho[i]->nchaves-1];
-				if (arv->filho[i+1]->folha){
-					arv->filho[i+1]->info[0]->mat = arv->filho[i]->info[arv->filho[i]->nchaves-1]->mat;
-					arv->filho[i+1]->info[0]->cr=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cr;
-					arv->filho[i+1]->info[0]->tranc=arv->filho[i]->info[arv->filho[i]->nchaves-1]->tranc;
-					arv->filho[i+1]->info[0]->ch_aprov=arv->filho[i]->info[arv->filho[i]->nchaves-1]->ch_aprov;
-					arv->filho[i+1]->info[0]->periodos=arv->filho[i]->info[arv->filho[i]->nchaves-1]->periodos;
-					arv->filho[i+1]->info[0]->cur=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cur;
-					strcpy(arv->filho[i+1]->info[0]->nome,arv->filho[i]->info[arv->filho[i]->nchaves-1]->nome);
-					
-				}
-				arv->filho[i]->nchaves--;
-				arv->chave[arv->nchaves-1] = arv->filho[i+1]->chave[0];
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i+1],ch,t);
-				
-			}
-			if (arv->filho[i]->nchaves == (t-1)){
-				printf("Aplicação do caso 3B.\n");
-				int j, partida = arv->filho[i]->nchaves;
-				arv->filho[i]->nchaves = arv->filho[i]->nchaves + arv->filho[i+1]->nchaves;
-				for (j=0; j < arv->filho[i+1]->nchaves; j++){
-					arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
-					if (arv->filho[i]->folha){
-						arv->filho[i]->info[partida+j]->mat = arv->filho[i+1]->info[j]->mat;
-						arv->filho[i]->info[partida+j]->cr=arv->filho[i+1]->info[j]->cr;
-						arv->filho[i]->info[partida+j]->tranc=arv->filho[i+1]->info[j]->tranc;
-						arv->filho[i]->info[partida+j]->ch_aprov=arv->filho[i+1]->info[j]->ch_aprov;
-						arv->filho[i]->info[partida+j]->periodos=arv->filho[i+1]->info[j]->periodos;
-						arv->filho[i]->info[partida+j]->cur=arv->filho[i+1]->info[j]->cur;
-						strcpy(arv->filho[i]->info[partida+j]->nome,arv->filho[i+1]->info[j]->nome);
-					}
+					arv->filho[j+1] = arv->filho[j+2];
 				}
 				arv->nchaves--;
-				arv->filho[i]->prox = arv->filho[i+1]->prox;
-				Libera(arv->filho[i+1]);
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i],ch,t);
+				printf("\nUma chamada recursiva.\n");
+				arv = remover(arv, ch, t);
+				return arv;
 			}
+			y->chave[t-1] = arv->chave[i];     //pegar chave [i] e coloca ao final de filho[i]
+			y->nchaves++;
+			int j;
+			for(j=0; j < t-1; j++){
+			  y->chave[t+j] = z->chave[j];     //passar filho[i+1] para filho[i]
+			  y->nchaves++;
+			}
+			if(!y->folha){
+			  for(j=0; j<t; j++){
+				y->filho[t+j] = z->filho[j];
+			  }
+			}
+			for(j=i; j < arv->nchaves-1; j++){ //limpar referências de i
+			  arv->chave[j] = arv->chave[j+1];
+			  arv->filho[j+1] = arv->filho[j+2];
+			}
+			arv->nchaves--;
+			printf("\nUma chamada recursiva.\n");
+			arv = remover(arv, ch, t);
+			return arv;
+		  }
+		  if((i > 0) && (arv->filho[i-1]->nchaves == t-1)){ 
+			printf("\nCASO 3B: i igual a nchaves\n");
+			z = arv->filho[i-1];
+			if (y->folha){
+				printf("Não rola");
+				return arv;
+			}
+			if(i == arv->nchaves)
+			  z->chave[t-1] = arv->chave[i-1]; //pegar chave[i] e poe ao final de filho[i-1]
+			else
+			  z->chave[t-1] = arv->chave[i];   //pegar chave [i] e poe ao final de filho[i-1]
+			z->nchaves++;
+			int j;
+			for(j=0; j < t-1; j++){
+			  z->chave[t+j] = y->chave[j];     //passar filho[i+1] para filho[i]
+			  z->nchaves++;
+			}
+			if(!z->folha){
+			  for(j=0; j<t; j++){
+				z->filho[t+j] = y->filho[j];
+			  }
+			}
+			arv->nchaves--;
+			arv->filho[i-1] = z;
+			printf("\nUma chamada recursiva.\n");
+			arv = remover(arv, ch, t);
+			return arv;
+		  }
 		}
 	}
-	if ((i >= 1)&&(i < arv->nchaves-1)){
-		if (ch < arv->chave[i]){
-			if (arv->filho[i]->nchaves >= t){
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i],ch,t);
-			}
-			if (arv->filho[i+1]->nchaves >=t){ //Pela Direita
-				printf("Aplicação do caso 3A.\n");
-				arv->filho[i]->nchaves++;
-				arv->filho[i]->chave[arv->nchaves-1] = arv->filho[i+1]->chave[0];
-				if (arv->filho[i]->folha){
-					arv->filho[i]->info[arv->nchaves-1] = arv->filho[i+1]->info[0];
-				}
-				arv->chave[i] = arv->filho[i+1]->chave[1];
-				int j;				
-				for (j=i; j < arv->filho[i+1]->nchaves; j++){
-					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j+1];
-					if (arv->filho[i+1]->folha){
-						arv->filho[i+1]->info[j]->mat = arv->filho[i+1]->info[j+1]->mat;
-						arv->filho[i+1]->info[j]->cr=arv->filho[i+1]->info[j+1]->cr;
-						arv->filho[i+1]->info[j]->tranc=arv->filho[i+1]->info[j+1]->tranc;
-						arv->filho[i+1]->info[j]->ch_aprov=arv->filho[i+1]->info[j+1]->ch_aprov;
-						arv->filho[i+1]->info[j]->periodos=arv->filho[i+1]->info[j+1]->periodos;
-						arv->filho[i+1]->info[j]->cur=arv->filho[i+1]->info[j+1]->cur;
-						strcpy(arv->filho[i+1]->info[j]->nome,arv->filho[i+1]->info[j+1]->nome);
-					}
-				}
-				arv->filho[i+1]->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i],ch,t);
-			}
-			if (arv->filho[i-1]->nchaves >=t){ //Pela Esquerda
-				printf("Aplicação do caso 3A.\n");
-				arv->filho[i]->nchaves++;
-				int j;
-				for (j=arv->filho[i]->nchaves-1; j >= 1; j--){
-					arv->filho[i]->chave[j] = arv->filho[i]->chave[j-1];
-					if (arv->filho[i]->folha){						
-						arv->filho[i]->info[j]->mat = arv->filho[i]->info[j-1]->mat;
-						arv->filho[i]->info[j]->cr=arv->filho[i]->info[j-1]->cr;
-						arv->filho[i]->info[j]->tranc=arv->filho[i]->info[j-1]->tranc;
-						arv->filho[i]->info[j]->ch_aprov=arv->filho[i]->info[j-1]->ch_aprov;
-						arv->filho[i]->info[j]->periodos=arv->filho[i]->info[j-1]->periodos;
-						arv->filho[i]->info[j]->cur=arv->filho[i]->info[j-1]->cur;
-						strcpy(arv->filho[i]->info[j]->nome,arv->filho[i]->info[j-1]->nome);
-					}
-				}
-				arv->filho[i]->chave[0] = arv->filho[i-1]->chave[arv->filho[i-1]->nchaves-1];
-				if (arv->filho[i]->folha){
-					arv->filho[i]->info[0]->mat = arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->mat;
-					arv->filho[i]->info[0]->cr=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->cr;
-					arv->filho[i]->info[0]->tranc=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->tranc;
-					arv->filho[i]->info[0]->ch_aprov=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->ch_aprov;
-					arv->filho[i]->info[0]->periodos=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->periodos;
-					arv->filho[i]->info[0]->cur=arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->cur;
-					strcpy(arv->filho[i]->info[0]->nome,arv->filho[i-1]->info[arv->filho[i-1]->nchaves-1]->nome);
-				}
-				arv->chave[i-1] = arv->filho[i]->chave[0];
-				arv->filho[i-1]->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i],ch,t);
-			}
-			if (arv->filho[i+1]->nchaves == (t-1)){
-				printf("Aplicação do caso 3B.\n");
-				int partida = arv->filho[i]->nchaves, j;
-				for (j=0; j < arv->filho[i+1]->nchaves; j++){
-					arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
-					if (arv->filho[i]->folha){
-						arv->filho[i]->chave[partida+j] = arv->filho[i+1]->chave[j];
-					}
-				}
-				arv->filho[i]->nchaves = arv->filho[i]->nchaves + arv->filho[i+1]->nchaves;
-				arv->filho[i]->prox = arv->filho[i+1]->prox;
-				Libera(arv->filho[i+1]);
-				for (j=i; j < arv->nchaves; j++){
-					arv->chave[i] = arv->chave[i+1];
-					arv->filho[i+1] = arv->filho[i+2];
-				}
-				arv->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i],ch,t);
-			}
-		}
-		if (ch == arv->chave[i]){
-			if (arv->filho[i+1]->nchaves >= t){
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i+1],ch,t);
-			}
-			if (arv->filho[i+2]->nchaves >= t){ //Pela Direita
-				printf("Aplicação do caso 3A.\n");
-				arv->filho[i+1]->nchaves++;
-				arv->filho[i+1]->chave[arv->nchaves-1] = arv->filho[i+2]->chave[0];
-				if (arv->filho[i+1]->folha){
-					arv->filho[i+1]->info[arv->nchaves-1]->mat = arv->filho[i+2]->info[0]->mat;
-					arv->filho[i+1]->info[arv->nchaves-1]->cr=arv->filho[i+2]->info[0]->cr;
-					arv->filho[i+1]->info[arv->nchaves-1]->tranc=arv->filho[i+2]->info[0]->tranc;
-					arv->filho[i+1]->info[arv->nchaves-1]->ch_aprov=arv->filho[i+2]->info[0]->ch_aprov;
-					arv->filho[i+1]->info[arv->nchaves-1]->periodos=arv->filho[i+2]->info[0]->periodos;
-					arv->filho[i+1]->info[arv->nchaves-1]->cur=arv->filho[i+2]->info[0]->cur;
-					strcpy(arv->filho[i+1]->info[arv->nchaves-1]->nome,arv->filho[i+2]->info[0]->nome);			
-				}
-				arv->chave[i+1] = arv->filho[i+2]->chave[1];
-				int j;				
-				for (j=i; j < arv->filho[i+2]->nchaves; j++){
-					arv->filho[i+2]->chave[j] = arv->filho[i+2]->chave[j+1];
-					if (arv->filho[i+2]->folha){
-						arv->filho[i+2]->info[j]->mat = arv->filho[i+2]->info[j+1]->mat;
-						arv->filho[i+2]->info[j]->cr=arv->filho[i+2]->info[j+1]->cr;
-						arv->filho[i+2]->info[j]->tranc=arv->filho[i+2]->info[j+1]->tranc;
-						arv->filho[i+2]->info[j]->ch_aprov=arv->filho[i+2]->info[j+1]->ch_aprov;
-						arv->filho[i+2]->info[j]->periodos=arv->filho[i+2]->info[j+1]->periodos;
-						arv->filho[i+2]->info[j]->cur=arv->filho[i+2]->info[j+1]->cur;
-						strcpy(arv->filho[i+2]->info[j]->nome,arv->filho[i+2]->info[j+1]->nome);
-					}
-				}
-				arv->filho[i+2]->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i+1],ch,t);
-			}
-			if (arv->filho[i]->nchaves >= t){ //Pela Esquerda
-				printf("Aplicação do caso 3A.\n");
-				arv->filho[i+1]->nchaves++;
-				int j;
-				for (j=arv->filho[i+1]->nchaves-1; j >= 1; j--){
-					arv->filho[i+1]->chave[j] = arv->filho[i+1]->chave[j-1];
-					if (arv->filho[i+1]->folha){
-						arv->filho[i+1]->info[j]->mat = arv->filho[i+1]->info[j-1]->mat;
-						arv->filho[i+1]->info[j]->cr=arv->filho[i+1]->info[j-1]->cr;
-						arv->filho[i+1]->info[j]->tranc=arv->filho[i+1]->info[j-1]->tranc;
-						arv->filho[i+1]->info[j]->ch_aprov=arv->filho[i+1]->info[j-1]->ch_aprov;
-						arv->filho[i+1]->info[j]->periodos=arv->filho[i+1]->info[j-1]->periodos;
-						arv->filho[i+1]->info[j]->cur=arv->filho[i+1]->info[j-1]->cur;
-						strcpy(arv->filho[i+1]->info[j]->nome,arv->filho[i+1]->info[j-1]->nome);
-					}
-				}
-				arv->filho[i]->chave[0] = arv->filho[i]->chave[arv->filho[i]->nchaves-1];
-				if (arv->filho[i]->folha){
-					arv->filho[i+1]->info[0]->mat = arv->filho[i]->info[arv->filho[i]->nchaves-1]->mat;
-					arv->filho[i+1]->info[0]->cr=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cr;
-					arv->filho[i+1]->info[0]->tranc=arv->filho[i]->info[arv->filho[i]->nchaves-1]->tranc;
-					arv->filho[i+1]->info[0]->ch_aprov=arv->filho[i]->info[arv->filho[i]->nchaves-1]->ch_aprov;
-					arv->filho[i+1]->info[0]->periodos=arv->filho[i]->info[arv->filho[i]->nchaves-1]->periodos;
-					arv->filho[i+1]->info[0]->cur=arv->filho[i]->info[arv->filho[i]->nchaves-1]->cur;
-					strcpy(arv->filho[i+1]->info[0]->nome,arv->filho[i]->info[arv->filho[i]->nchaves-1]->nome);
-				}
-				arv->chave[i] = arv->filho[i+1]->chave[0];
-				arv->filho[i]->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i+1],ch,t);
-			}
-			if (arv->filho[i+2]->nchaves == (t-1)){
-				printf("Aplicação do caso 3B.\n");
-				int partida = arv->filho[i+1]->nchaves, j;
-				for (j=0; j < arv->filho[i+2]->nchaves; j++){
-					arv->filho[i+1]->chave[partida+j] = arv->filho[i+2]->chave[j];
-					if (arv->filho[i+1]->folha){
-						arv->filho[i+1]->chave[partida+j] = arv->filho[i+2]->chave[j];
-					}
-				}
-				arv->filho[i+1]->nchaves = arv->filho[i+1]->nchaves + arv->filho[i+2]->nchaves;
-				arv->filho[i+1]->prox = arv->filho[i+2]->prox;
-				Libera(arv->filho[i+2]);
-				for (j=i; j < arv->nchaves; j++){
-					arv->chave[i+1] = arv->chave[i+2];
-					arv->filho[i+2] = arv->filho[i+3];
-				}
-				arv->nchaves--;
-				printf("Uma chamada recursiva.\n");
-				return remover(arv->filho[i+1],ch,t);
-			}
-		}
-	}
+	printf("\nExecutando uma chamada recursiva no filho %d.\n", i);
+	arv->filho[i] = remover(arv->filho[i], ch, t);
+	return arv;
 }
 
 /* Aplicar divisão em nós cheios
@@ -572,7 +418,6 @@ TABM * otimizaArvore(TABM *a, int t){
     return a;
    }
 
-
 TABM * removeFormandos(TABM * a, int t){
     if(!a) return NULL;
     TABM * aux = (TABM *) malloc (sizeof(TABM));
@@ -687,7 +532,6 @@ TABM * alteraPeriodo (TABM *a, int t, int mat, int nperi){
   return a;
 }
 
-#define MAXTAMLINE 1001
 TREG* criaReg(int mat, float cr, int tranc, int ch_aprov, int periodos, int cur, char *nome){
 	TREG *r=(TREG*)malloc(sizeof(TREG));
 	r->mat=mat;
@@ -698,35 +542,6 @@ TREG* criaReg(int mat, float cr, int tranc, int ch_aprov, int periodos, int cur,
 	r->periodos = periodos;
 	strcpy(r->nome,nome);
 	return r;
-}
-//@Deprecated
-int parseFile(FILE* fp, int* mat, float* cr,int* tranc,int* ch_aprov, int* periodos, int* cur, char* nome){
-	char linha[MAXTAMLINE+1+1];
-	char *aux;
-	if (fgets(linha,MAXTAMLINE+1,fp)==NULL) return 0;
-	if (!linha) return 0;
-	aux=strtok(linha," ");
-	if(aux==NULL) return 0;
-	*mat=atoi(aux);
-	printf("%d\n",*mat);
-	aux=strtok(NULL," ");
-	*cr=atof(aux);
-	printf("%f\n",*cr);
-	aux=strtok(NULL," ");
-	*tranc=atoi(aux);
-	printf("%d\n",*tranc);
-	aux=strtok(NULL," ");
-	*ch_aprov=atoi(aux);
-	printf("%d\n",*ch_aprov);
-	aux=strtok(NULL," ");
-	*periodos=atoi(aux);
-	printf("%d\n",*periodos);
-	aux=strtok(NULL, " ");
-	*cur=atoi(aux);
-	printf("%d\n",*cur);
-	nome=strtok(NULL,"\n");
-	printf("%s\n",nome);
-	return 7;
 }
 
 /* Gerar uma árvore a partir de dados de um arquivo
@@ -760,14 +575,6 @@ TABM * novaArv (char *nome, int t){
 			a = Insere(a, mat, t,aux);
 		}
 	}
-   /*int r = parseFile(fp,&aux->mat,&aux->cr,&aux->tranc,&aux->ch_aprov,&aux->periodos,&aux->cur,&aux->nome);
-   printf("%d\n",aux->mat);
-   printf("%f\n",aux->cr);
-   printf("%d\n",aux->tranc);
-   printf("%d\n",aux->ch_aprov);
-   printf("%d\n",aux->periodos);
-   printf("%d\n",aux->cur);
-   printf("%s\n",aux->nome);*/
    fclose(fp);
    return a;
 }
@@ -808,7 +615,6 @@ int gravarDados (TABM *a, char *saida){
   printf("\n---------------\n");
   return 1;
 }
-
 
 /* Exibir dados de um aluno específico
  * parametros : 
