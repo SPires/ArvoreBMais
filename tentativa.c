@@ -471,21 +471,21 @@ TABM *Divisao(TABM *x, int i, TABM* y, int t){
 	z->prox = y->prox;
 	y->prox = z;
   }
+  for(j=0;j<t-1;j++) z->chave[j] = y->chave[j+t];
   if(!y->folha){
-    for(j=0;j<t-1;j++) z->chave[j] = y->chave[j+t];
     for(j=0;j<t;j++){
-      z->filho[j] = y->filho[j+t+1];
-      y->filho[j+t+1] = NULL;
+      z->filho[j] = y->filho[j+t];
+      y->filho[j+t] = NULL;
     }
   }
-  y->nchaves = y->nchaves - (t-1);
-  for(j=x->nchaves; j>=i; j--){
-	x->filho[j+1]=x->filho[j];
+  if (y-> folha) {
+	y->nchaves -= t-1;
+  } else {
+	y->nchaves = t-1;
   }
+  for(j=x->nchaves; j>=i; j--) x->filho[j+1]=x->filho[j];
   x->filho[i] = z;
-  for(j=x->nchaves; j>=i; j--){
-	x->chave[j] = x->chave[j-1];
-  }
+  for(j=x->nchaves; j>=i; j--) x->chave[j] = x->chave[j-1];
   if (y->folha){
 	x->chave[i-1] = z->chave[0];
   } else {
@@ -504,25 +504,27 @@ TABM *Divisao(TABM *x, int i, TABM* y, int t){
  *
  * retorno: nova árvore */
 TABM *Insere_Nao_Completo(TABM *x, int k, int t, TREG *dado){
-	if (x->folha){
-		int i=0, j;
-		while ((i <= x->nchaves)&&(k > x->chave[i])) i++;
-		x->nchaves++;
-		for (j=x->nchaves-1; j >= i; j--){
-			x->chave[j] = x->chave[j-1];
-			x->info[j] = x->info[j-1];
-		}
-		x->chave[i] = k;
-		x->info[i] = dado;
-		return x;
-	}
-	int i=0;
-	while ((i < x->nchaves)&&(k > x->chave[i])) i++;
-	if (x->filho[i]->nchaves == ((2*t)-1)) {
-		x = Divisao(x,i,x->filho[i],t);
-	}
-	x = Insere_Nao_Completo(x->filho[i], k, t, dado);
-	return x;
+  int i = x->nchaves-1;
+  if(x->folha){
+    while((i>=0) && (k<x->chave[i])){
+      x->chave[i+1] = x->chave[i];
+      x->info[i+1] = x->info[i];
+      x->info[i] = NULL;
+      i--;
+    }
+    x->chave[i+1] = k;
+    x->info[i+1] = dado;
+    x->nchaves++;
+    return x;
+  }
+  while((i>=0) && (k<x->chave[i])) i--;
+  i++;
+  if(x->filho[i]->nchaves == ((2*t)-1)){
+    x = Divisao(x, (i+1), x->filho[i], t);
+    if(k>x->chave[i]) i++;
+  }
+  x->filho[i] = Insere_Nao_Completo(x->filho[i], k, t, dado);
+  return x;
 } 
 
 /* Inserção
