@@ -132,15 +132,15 @@ TABM* remover(TABM* arv, int ch, int t){
 	printf("Removendo %d...\n", ch);
 	for(i = 0; i<arv->nchaves && arv->chave[i] < ch; i++);
 	if(arv->folha){ //CASO 1
-      printf("\nAplicando o CASO 1\n");
-      int j;
-      for(j=i; j<arv->nchaves-1;j++){
-		  arv->chave[j] = arv->chave[j+1];
-		  arv->info[j] = arv->info[j+1];
-		  arv->info[j+1] = NULL;
-	  }
-      arv->nchaves--;
-      return arv;      
+      		printf("\nAplicando o CASO 1\n");
+      		int j;
+      		for(j=i; j<arv->nchaves-1;j++){
+			  arv->chave[j] = arv->chave[j+1];
+			  arv->info[j] = arv->info[j+1];
+			  arv->info[j+1] = NULL;
+		}
+      		arv->nchaves--;
+      		return arv;      
 	}
 	TABM *y = arv->filho[i], *z = NULL, *anterior = NULL;
 	
@@ -221,23 +221,22 @@ TABM* remover(TABM* arv, int ch, int t){
 		
 		if(!z){ //CASO 3B
 		  if(i < arv->nchaves && arv->filho[i+1]->nchaves == t-1){
-			printf("\nCASO 3B: i menor que nchaves\n");
+			printf("\nAplicando o CASO 3B.\n");
 			z = arv->filho[i+1];
 			if (y->folha){
-				int k,j;
+				int k;
 				for (k=0; k < z->nchaves; k++){
-					y->chave[(y->nchaves-1)+k] = z->chave[k];
-					y->info[(y->nchaves-1)+k] = z->info[k];
+					y->chave[t-1+k] = z->chave[k];
+					y->info[t-1+k] = z->info[k];
 				}
 				y->nchaves += z->nchaves;
 				y->prox = z->prox;
-				for(j=i; j < arv->nchaves-1; j++){
-					arv->chave[j] = arv->chave[j+1];
-					arv->filho[j+1] = arv->filho[j+2];
+				for (k=i; k < arv->nchaves; k++){
+					arv->chave[k] =	arv->chave[k+1];
+					arv->filho[k+1] = arv->filho[k+2];
 				}
 				arv->nchaves--;
-				printf("\nUma chamada recursiva.\n");
-				arv = remover(arv, ch, t);
+				arv->filho[i] = remover (arv->filho[i], ch, t);
 				return arv;
 			}
 			y->chave[t-1] = arv->chave[i];     //pegar chave [i] e coloca ao final de filho[i]
@@ -757,7 +756,7 @@ int main () {
       case 4:
 	{	
 		if (!arvore) {
-			printf("\nBase de dados não carregada.\n\n");
+			printf("\nÁrvore não carregada.\n\n");
 			break;
 		}
 		arvore=otimizaArvore(arvore,t);
