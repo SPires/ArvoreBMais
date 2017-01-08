@@ -156,6 +156,7 @@ TABM* remover(TABM* arv, int ch, int t){
 				y->info[t-1] = z->info[0];
 				z->info[0] = NULL;
 				arv->chave[i] = z->chave[1];
+				y->nchaves++;
 				int k;
 				for (k=1; k < z->nchaves; k++){
 					z->chave[k-1] = z->chave[k];
@@ -223,7 +224,7 @@ TABM* remover(TABM* arv, int ch, int t){
 			printf("\nCASO 3B: i menor que nchaves\n");
 			z = arv->filho[i+1];
 			if (y->folha){
-				int k;
+				int k,j;
 				for (k=0; k < z->nchaves; k++){
 					y->chave[(y->nchaves-1)+k] = z->chave[k];
 					y->info[(y->nchaves-1)+k] = z->info[k];
