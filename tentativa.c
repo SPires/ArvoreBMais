@@ -88,15 +88,11 @@ TABM *Busca(TABM* x, int ch){
 	int i=0;
 	if (x->folha) {
 		while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
-		if(i==x->nchaves) return NULL;
 		if (ch == x->chave[i]) return x;
 	}
-	else{
-		while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
-		if (i<x->nchaves && ch == x->chave[i]) return Busca(x->filho[i+1],ch);
-		return Busca(x->filho[i],ch);
-	}
-	
+	while ((i < x->nchaves)&&(ch > x->chave[i])) i++;
+	if (ch == x->chave[i]) return Busca(x->filho[i+1],ch);
+	return Busca(x->filho[i],ch);	
 }
    
 TABM* remover(TABM* arv, int ch, int t);
@@ -142,7 +138,7 @@ TABM* remover(TABM* arv, int ch, int t){
       		arv->nchaves--;
       		return arv;      
 	}
-	TABM *y = arv->filho[i], *z = NULL, *anterior = NULL;
+	TABM *y = arv->filho[i], *z = NULL, *anterior = NULL;	
 	
 	if (y->nchaves == t-1){
 		
@@ -187,6 +183,7 @@ TABM* remover(TABM* arv, int ch, int t){
 			z = arv->filho[i-1];
 			if (y->folha){
 				int k;
+				y->nchaves++;
 				for (k=y->nchaves; k > 0; k--){
 					y->chave[k] = y->chave[k-1];
 					y->info[k] = y->info[k-1];
@@ -195,7 +192,6 @@ TABM* remover(TABM* arv, int ch, int t){
 				y->chave[0] = z->chave[z->nchaves-1];
 				y->info[0] = z->info[z->nchaves-1];
 				z->info[z->nchaves-1] = NULL;
-				y->nchaves++;
 				arv->chave[i-1] = y->chave[0];
 				z->nchaves--;
 				printf("\nUma chamada recursiva.\n");
@@ -867,7 +863,8 @@ int main () {
         	//fflush(stdin);
 		char *saida = "saida.txt";
         	gravarDados(arvore,saida);
-			break;
+		arvore = NULL;
+		break;
 		}
     }
   }
