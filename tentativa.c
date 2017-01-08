@@ -611,9 +611,9 @@ int gravarDados (TABM *a, char *saida){
   fclose(fp);
   Libera(a);
   a=NULL;
-  printf("\n---------------\n");
+  printf("\n\n---------------\n");
   printf("Árvore enviada para o arquivo e liberada.");
-  printf("\n---------------\n");
+  printf("\n---------------\n\n\n");
   return 1;
 }
 
