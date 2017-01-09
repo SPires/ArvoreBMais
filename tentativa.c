@@ -124,7 +124,7 @@ TABM* remover(TABM* arv, int ch, int t){
 		printf("Árvore vazia ou não carregada.");
 		return arv;
 	}
-	int i;
+	int i=0;
 	printf("Removendo %d...\n", ch);
 	for(i = 0; i<arv->nchaves && arv->chave[i] < ch; i++);
 	if(arv->folha){ //CASO 1
@@ -135,8 +135,9 @@ TABM* remover(TABM* arv, int ch, int t){
 			  arv->info[j] = arv->info[j+1];
 			  arv->info[j+1] = NULL;
 		}
-      		arv->nchaves--;
-      		return arv;      
+		arv->nchaves--;
+		return arv;
+      		      
 	}
 	TABM *y = arv->filho[i], *z = NULL, *anterior = NULL;	
 	
@@ -192,7 +193,7 @@ TABM* remover(TABM* arv, int ch, int t){
 				y->chave[0] = z->chave[z->nchaves-1];
 				y->info[0] = z->info[z->nchaves-1];
 				z->info[z->nchaves-1] = NULL;
-				arv->chave[i-1] = y->chave[0];
+				arv->chave[i] = y->chave[0];
 				z->nchaves--;
 				printf("\nUma chamada recursiva.\n");
 				arv->filho[i] = remover(y, ch, t);
