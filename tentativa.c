@@ -288,7 +288,7 @@ TABM* remover(TABM* arv, int ch, int t){
 		}
 	}
 	printf("\nExecutando uma chamada recursiva no filho %d.\n", i);
-	arv->filho[i] = remover(arv->filho[i], ch, t);
+	arv->filho[i+1] = remover(arv->filho[i+1], ch, t);
 	return arv;
 }
 
